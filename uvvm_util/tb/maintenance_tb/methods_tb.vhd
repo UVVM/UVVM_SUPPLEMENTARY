@@ -690,7 +690,19 @@ begin
       check_value(std_logic_vector'("0000010010"), "00--10-10", MATCH_STD, error, "My msg dontcare-in-extended-width HEX, AS_IS, OK", C_SCOPE, HEX, AS_IS);
       check_value(std_logic_vector'("0000010010"), "00--10-10", MATCH_EXACT, error, "My msg dontcare-in-extended-width HEX, AS_IS, Fail", C_SCOPE, HEX, AS_IS);
 
+      -- MATCH_STD_INCL_Z
       check_value(std_logic_vector'("000Z0Z00Z0"), "000Z0Z00Z0", MATCH_STD_INCL_Z, error, "Check MATCH_STD_INCL_Z", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("01Z0"), "----", MATCH_STD_INCL_Z, error, "Check MATCH_STD_INCL_Z with don't care", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("01Z0"), "01--", MATCH_STD_INCL_Z, error, "Check MATCH_STD_INCL_Z with don't care", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("01Z0"), "01-1", MATCH_STD_INCL_Z, error, "Check MATCH_STD_INCL_Z with don't care, FAIL", C_SCOPE, HEX, AS_IS);
+      increment_expected_alerts(error, 1);
+
+      -- MATCH_STD_INCL_ZXUW
+      check_value(std_logic_vector'("000Z0Z00Z0"), "000Z0Z00Z0", MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000X0X00X0"), "000X0X00X0", MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000U0U00U0"), "000U0U00U0", MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000W0W00W0"), "000W0W00W0", MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("0Z0X0U00W0"), "0Z0X0U00W0", MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
 
       check_value(std_logic_vector'("0000010010"), "0000010010", error, "My msg HEX_BIN_IF_INVALID, OK", C_SCOPE, HEX_BIN_IF_INVALID);
       check_value(std_logic_vector'("0000011111"), "0000010010", error, "My msg HEX_BIN_IF_INVALID, Fail", C_SCOPE, HEX_BIN_IF_INVALID);
@@ -759,7 +771,13 @@ begin
       check_value('L', '0', MATCH_STD, warning, "My msg SL, OK", C_SCOPE);
       check_value('1', 'H', MATCH_EXACT, warning, "My msg SL, Fail", C_SCOPE);
       check_value('-', '1', MATCH_EXACT, warning, "My msg SL, Fail", C_SCOPE);
+      -- MATCH_STD_INCL_Z
       check_value('Z', 'Z', MATCH_STD_INCL_Z, error, "Check MATCH_STD_INCL_Z", C_SCOPE);
+      -- MATCH_STD_INCL_ZXUW
+      check_value('Z', 'Z', MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('X', 'X', MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('U', 'U', MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('W', 'W', MATCH_STD_INCL_ZXUW, error, "Check MATCH_STD_INCL_ZXUW", C_SCOPE);
 
       -- time
       v_t := 15 ns;
@@ -1488,7 +1506,23 @@ begin
       slv8 <= transport "10110001" after 4 ns;
       await_value(slv8, "10--0001", MATCH_STD, 3 ns, 5 ns, error, "Change within time window 2, STD match, OK", C_SCOPE);
 
-      increment_expected_alerts(error, 4);
+      -- MATCH_STD_INCL_Z
+      wait for 10 ns;
+      slv8 <= transport "1011000Z" after 4 ns;
+      await_value(slv8, "1011000Z", MATCH_STD_INCL_Z, 3 ns, 5 ns, error, "Change within time window 3, STD match including Z, OK", C_SCOPE);
+      wait for 10 ns;
+      slv8 <= transport "Z011000Z" after 4 ns;
+      await_value(slv8, "1011000Z", MATCH_STD_INCL_Z, 3 ns, 5 ns, error, "Different values, STD match including Z, Fail", C_SCOPE);
+
+      -- MATCH_STD_INCL_ZXUW
+      wait for 10 ns;
+      slv8 <= transport "1W1U0X0Z" after 4 ns;
+      await_value(slv8, "1W1U0X0Z", MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Change within time window 3, STD match including ZXUW, OK", C_SCOPE);
+      wait for 10 ns;
+      slv8 <= transport "1W110X0Z" after 4 ns;
+      await_value(slv8, "1W1U1X0Z", MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Different values, STD match including ZXUW, Fail 1", C_SCOPE);
+
+      increment_expected_alerts(error, 6);
 
       -- await_value : unsigned
       u8 <= "00000000";
@@ -1571,7 +1605,54 @@ begin
       sl <= transport 'H' after 3 ns;
       await_value(sl, '1', MATCH_EXACT, 3 ns, 5 ns, error, "Change within time window to weak, expecting forced, FAIL", C_SCOPE);
       wait for 10 ns;
-      increment_expected_alerts(error, 5);
+
+      -- MATCH_STD_INCL_Z
+      sl <= '1';
+      wait for 1 ns;
+      sl <= transport 'Z' after 3 ns;
+      await_value(sl, 'Z', MATCH_STD_INCL_Z , 3 ns, 5 ns, error, "Change within time window, STD match including Z, OK", C_SCOPE);
+      wait for 10 ns;
+      sl <= transport '1' after 3 ns;
+      await_value(sl, 'Z', MATCH_STD_INCL_Z , 3 ns, 5 ns, error, "Different values, STD match including Z, Fail", C_SCOPE);
+
+      -- MATCH_STD_INCL_ZXUW
+      wait for 1 ns;
+      sl <= '1';
+      wait for 1 ns;
+      sl <= transport 'Z' after 3 ns;
+      await_value(sl, 'Z', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Change within time window, STD match including ZXUW, OK", C_SCOPE);
+      wait for 10 ns;
+      sl <= transport '1' after 3 ns;
+      await_value(sl, 'Z', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Different values, STD match including ZXUW, Fail 2", C_SCOPE);
+
+      wait for 1 ns;
+      sl <= '1';
+      wait for 1 ns;
+      sl <= transport 'X' after 3 ns;
+      await_value(sl, 'X', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Change within time window, STD match including ZXUW, OK", C_SCOPE);
+      wait for 10 ns;
+      sl <= transport '1' after 3 ns;
+      await_value(sl, 'X', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Different values, STD match including ZXUW, Fail 3", C_SCOPE);
+
+      wait for 1 ns;
+      sl <= '1';
+      wait for 1 ns;
+      sl <= transport 'U' after 3 ns;
+      await_value(sl, 'U', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Change within time window, STD match including ZXUW, OK", C_SCOPE);
+      wait for 10 ns;
+      sl <= transport '1' after 3 ns;
+      await_value(sl, 'U', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Different values, STD match including ZXUW, Fail 4", C_SCOPE);
+
+      wait for 1 ns;
+      sl <= '1';
+      wait for 1 ns;
+      sl <= transport 'W' after 3 ns;
+      await_value(sl, 'W', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Change within time window, STD match including ZXUW, OK", C_SCOPE);
+      wait for 10 ns;
+      sl <= transport '1' after 3 ns;
+      await_value(sl, 'W', MATCH_STD_INCL_ZXUW, 3 ns, 5 ns, error, "Different values, STD match including ZXUW, Fail 5", C_SCOPE);
+
+      increment_expected_alerts(error, 10);
 
       -- await_value : integer
       i <= 0;
@@ -2897,6 +2978,43 @@ begin
       log(ID_SEQUENCER, "Normal line");
 
 
+    elsif GC_TESTCASE = "alert_summary_report" then
+      -- NOTE, TB_NOTE, WARNING, TB_WARNING, MANUAL_CHECK
+
+      -- Test of ignored alert
+      log(ID_LOG_HDR, "Testing alert summary report");
+
+      log("Testing without any major or minor alerts");
+      report_alert_counters(FINAL);
+
+      log("Testing NOTE");
+      alert(NOTE, "This alert shall set mismatch in minor alerts report", C_SCOPE);
+      report_alert_counters(FINAL);
+      increment_expected_alerts(NOTE);
+
+      log("Testing TB_NOTE");
+      alert(TB_NOTE, "This alert shall set mismatch in minor alerts report", C_SCOPE);
+      report_alert_counters(FINAL);
+      increment_expected_alerts(TB_NOTE);
+
+      log("Testing WARNING");
+      alert(WARNING, "This alert shall set mismatch in minor alerts report", C_SCOPE);
+      report_alert_counters(FINAL);
+      increment_expected_alerts(WARNING);
+
+      log("Testing TB_WARNING");
+      alert(TB_WARNING, "This alert shall set mismatch in minor alerts report", C_SCOPE);
+      report_alert_counters(FINAL);
+      increment_expected_alerts(TB_WARNING);
+
+      log("Testing MANUAL_CHECK");
+      alert(MANUAL_CHECK, "This alert shall set mismatch in minor alerts report", C_SCOPE);
+      report_alert_counters(FINAL);
+      increment_expected_alerts(MANUAL_CHECK);
+
+      log("Testing final summeray, all OK");
+
+
     elsif GC_TESTCASE = "ignored_alerts" then
       -- Test of ignored alert
       log(ID_LOG_HDR, "Testing alert_level NO_ALERT and related functions");
@@ -2917,6 +3035,68 @@ begin
       increment_expected_alerts_and_stop_limit(TB_FAILURE);
       check_value(get_alert_stop_limit(TB_FAILURE) = (v_alert_stop_limit+1), TB_ERROR, "Verifying that TB_WARNING alert stop limit was incremented", C_SCOPE);
       check_value(true = false, TB_FAILURE, "Cause TB_FAILURE trigger", C_SCOPE);
+
+    elsif GC_TESTCASE = "hierarchical_alerts_report" then
+      -- NOTE, TB_NOTE, WARNING, TB_WARNING, MANUAL_CHECK
+
+      log(ID_LOG_HDR, "Verifying hierarchy linked list minor alerts report summary", "");
+
+      v_local_hierarchy_tree.initialize_hierarchy(justify(C_SCOPE, left, C_HIERARCHY_NODE_NAME_LENGTH), (others => 0));
+
+      v_local_hierarchy_tree.insert_in_tree((justify("first_node", left, C_HIERARCHY_NODE_NAME_LENGTH), (others => (others => 0)), (others => 0), (others => true)), justify(C_SCOPE, left, C_HIERARCHY_NODE_NAME_LENGTH));
+      check_value(v_local_hierarchy_tree.get_parent_scope((justify("first_node", left, C_HIERARCHY_NODE_NAME_LENGTH))) = justify(C_SCOPE, left, C_HIERARCHY_NODE_NAME_LENGTH), error, "Verifying parent scope!");
+
+      v_local_hierarchy_tree.insert_in_tree((justify("second_node", left, C_HIERARCHY_NODE_NAME_LENGTH), (others => (others => 0)), (others => 0), (others => true)), justify("first_node", left, C_HIERARCHY_NODE_NAME_LENGTH));
+      check_value(v_local_hierarchy_tree.get_parent_scope((justify("second_node", left, C_HIERARCHY_NODE_NAME_LENGTH))) = justify("first_node", left, C_HIERARCHY_NODE_NAME_LENGTH), error, "Verifying parent scope!");
+
+      v_local_hierarchy_tree.insert_in_tree((justify("third_node", left, C_HIERARCHY_NODE_NAME_LENGTH), (others => (others => 0)), (others => 0), (others => true)), justify(C_SCOPE, left, C_HIERARCHY_NODE_NAME_LENGTH));
+      check_value(v_local_hierarchy_tree.get_parent_scope((justify("third_node", left, C_HIERARCHY_NODE_NAME_LENGTH))) = justify(C_SCOPE, left, C_HIERARCHY_NODE_NAME_LENGTH), error, "Verifying parent scope!");
+
+      v_local_hierarchy_tree.insert_in_tree((justify("fourth_node", left, C_HIERARCHY_NODE_NAME_LENGTH), (others => (others => 0)), (others => 0), (others => true)), justify("third_node", left, C_HIERARCHY_NODE_NAME_LENGTH));
+      check_value(v_local_hierarchy_tree.get_parent_scope((justify("fourth_node", left, C_HIERARCHY_NODE_NAME_LENGTH))) = justify("third_node", left, C_HIERARCHY_NODE_NAME_LENGTH), error, "Verifying parent scope!");
+
+      v_local_hierarchy_tree.print_hierarchical_log;
+      
+
+
+      log("Enabling all alert levels in entire hierarchy. Minor alerts for alle nodes triggered.");
+      v_local_hierarchy_tree.enable_all_alert_levels("TB seq");
+
+      log("Testing NOTE with fourth_node");
+      v_local_hierarchy_tree.alert("fourth_node", NOTE);
+      v_local_hierarchy_tree.print_hierarchical_log;
+      v_local_hierarchy_tree.increment_expected_alerts("fourth_node", NOTE);
+      log("Expecting no major or minor alerts");
+      v_local_hierarchy_tree.print_hierarchical_log;
+
+      log("Testing TB_NOTE with third_node");
+      v_local_hierarchy_tree.alert("third_node", TB_NOTE);
+      v_local_hierarchy_tree.print_hierarchical_log;
+      v_local_hierarchy_tree.increment_expected_alerts("third_node", TB_NOTE);
+      log("Expecting no major or minor alerts");
+      v_local_hierarchy_tree.print_hierarchical_log;
+
+      log("Testing WARNING with second_node");
+      v_local_hierarchy_tree.alert("second_node", WARNING);
+      v_local_hierarchy_tree.print_hierarchical_log;
+      v_local_hierarchy_tree.increment_expected_alerts("second_node", WARNING);
+      log("Expecting no major or minor alerts");
+      v_local_hierarchy_tree.print_hierarchical_log;
+
+      log("Testing TB_WARNING with first_node");
+      v_local_hierarchy_tree.alert("first_node", TB_WARNING);
+      v_local_hierarchy_tree.print_hierarchical_log;
+      v_local_hierarchy_tree.increment_expected_alerts("first_node", TB_WARNING);
+      log("Expecting no major or minor alerts");
+      v_local_hierarchy_tree.print_hierarchical_log;
+
+      log("Testing MANUAL_CHECK with TB seq");
+      v_local_hierarchy_tree.alert("TB seq", MANUAL_CHECK);
+      v_local_hierarchy_tree.print_hierarchical_log;
+      v_local_hierarchy_tree.increment_expected_alerts("TB seq", MANUAL_CHECK);
+      log("Expecting no major or minor alerts");
+      v_local_hierarchy_tree.print_hierarchical_log;
+
 
     elsif GC_TESTCASE = "hierarchical_alerts" then
       -- Hierarchy linked list pkg
@@ -3540,7 +3720,15 @@ begin
       check_value(std_logic_vector'("0000010010"), "00--10-10", MATCH_STD,"My msg dontcare-in-extended-width HEX, AS_IS, OK", C_SCOPE, HEX, AS_IS);
       check_value(std_logic_vector'("0000010010"), "00--10-10", MATCH_EXACT,"My msg dontcare-in-extended-width HEX, AS_IS, Fail", C_SCOPE, HEX, AS_IS);
 
+      -- MATCH_STD_INCL_Z
       check_value(std_logic_vector'("000Z0Z00Z0"), "000Z0Z00Z0", MATCH_STD_INCL_Z,"Check MATCH_STD_INCL_Z", C_SCOPE, HEX, AS_IS);
+
+      -- MATCH_STD_INCL_ZXUW
+      check_value(std_logic_vector'("000Z0Z00Z0"), "000Z0Z00Z0", MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000X0X00X0"), "000X0X00X0", MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000U0U00U0"), "000U0U00U0", MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("000W0W00W0"), "000W0W00W0", MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
+      check_value(std_logic_vector'("0Z0X0U00W0"), "0Z0X0U00W0", MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE, HEX, AS_IS);
 
       check_value(std_logic_vector'("0000010010"), "0000010010","My msg HEX_BIN_IF_INVALID, OK", C_SCOPE, HEX_BIN_IF_INVALID);
       check_value(std_logic_vector'("0000011111"), "0000010010","My msg HEX_BIN_IF_INVALID, Fail", C_SCOPE, HEX_BIN_IF_INVALID);
@@ -3609,8 +3797,14 @@ begin
       check_value('L', '0', MATCH_STD,"My msg SL, OK", C_SCOPE);
       check_value('1', 'H', MATCH_EXACT,"My msg SL, Fail", C_SCOPE);
       check_value('-', '1', MATCH_EXACT,"My msg SL, Fail", C_SCOPE);
+      -- MATCH_STD_INCL_Z
       check_value('Z', 'Z', MATCH_STD_INCL_Z,"Check MATCH_STD_INCL_Z", C_SCOPE);
-
+      -- MATCH_STD_INCL_ZXUW
+      check_value('Z', 'Z', MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('X', 'X', MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('U', 'U', MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      check_value('W', 'W', MATCH_STD_INCL_ZXUW,"Check MATCH_STD_INCL_ZXUW", C_SCOPE);
+      
       -- time
       v_t := 15 ns;
       v_b := check_value(15 ns, 74 ps,"My msg I, Fail", C_SCOPE);
@@ -4477,10 +4671,6 @@ begin
       wait for 10 ns;
       await_stable(r, 50 ns, FROM_LAST_EVENT, 49 ns, FROM_LAST_EVENT, "r: Stable FROM_LAST_EVENT, FROM_LAST_EVENT, FAIL after 39 ns", C_SCOPE);
       increment_expected_alerts(error, 1);
-
-      
-    else
-      alert(tb_error, "Unsupported test");
     end if;
 
     -----------------------------------------------------------------------------

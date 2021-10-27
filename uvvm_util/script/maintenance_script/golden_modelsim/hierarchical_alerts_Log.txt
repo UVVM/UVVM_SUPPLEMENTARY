@@ -34,6 +34,13 @@ UVVM:                ID_CLOCK_GEN                 : ENABLED
 UVVM:                ID_GEN_PULSE                 : ENABLED
 UVVM:                ID_BLOCKING                  : ENABLED
 UVVM:                ID_WATCHDOG                  : ENABLED
+UVVM:                ID_RAND_GEN                  : DISABLED
+UVVM:                ID_RAND_CONF                 : DISABLED
+UVVM:                ID_FUNC_COV_BINS             : DISABLED
+UVVM:                ID_FUNC_COV_BINS_INFO        : DISABLED
+UVVM:                ID_FUNC_COV_RAND             : DISABLED
+UVVM:                ID_FUNC_COV_SAMPLE           : DISABLED
+UVVM:                ID_FUNC_COV_CONFIG           : DISABLED
 UVVM:                ID_POS_ACK                   : ENABLED
 UVVM:                ID_LOG_HDR                   : ENABLED
 UVVM:                ID_LOG_HDR_LARGE             : ENABLED
@@ -57,6 +64,7 @@ UVVM:                ID_PACKET_HDR                : ENABLED
 UVVM:                ID_PACKET_DATA               : ENABLED
 UVVM:                ID_PACKET_CHECKSUM           : ENABLED
 UVVM:                ID_PACKET_GAP                : ENABLED
+UVVM:                ID_PACKET_PAYLOAD            : ENABLED
 UVVM:                ID_FRAME_INITIATE            : ENABLED
 UVVM:                ID_FRAME_COMPLETE            : ENABLED
 UVVM:                ID_FRAME_HDR                 : ENABLED
@@ -476,7 +484,7 @@ UVVM:         |- second_node                      :      0/0/0       0/0/0      
 UVVM:         `- third_node                       :     0/15/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0 
 UVVM:            `- fourth_node                   :     0/15/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0       0/0/0 
 UVVM:      ====================================================================================================================================================================
-UVVM:      >> Simulation SUCCESS: No mismatch between counted and expected serious alerts
+UVVM:      >> Simulation SUCCESS: No mismatch between counted and expected serious alerts, but mismatch in minor alerts
 UVVM:      ====================================================================================================================================================================
 UVVM:      
 UVVM:      
@@ -1121,7 +1129,7 @@ UVVM:                TB_ERROR     :      0         0         0         ok
 UVVM:                FAILURE      :      0         0         0         ok
 UVVM:                TB_FAILURE   :      0         0         0         ok
 UVVM:      ====================================================================================================================================================================
-UVVM:      >> Simulation SUCCESS: No mismatch between counted and expected serious alerts
+UVVM:      >> Simulation SUCCESS: No mismatch between counted and expected serious alerts, but mismatch in minor alerts
 UVVM:      ====================================================================================================================================================================
 UVVM:      
 UVVM:      

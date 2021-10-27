@@ -167,7 +167,7 @@ package ti_protected_types_pkg is
       constant vvc_idx  : in natural
     ) return string;
 
-    impure function priv_get_vvc_info_list return string;
+    impure function priv_get_vvc_info_list (idx : natural := natural'low) return string;
 
     impure function priv_get_num_vvc_in_list return natural;
 
@@ -263,7 +263,7 @@ package body ti_protected_types_pkg is
     ) return integer is
     begin
       for idx in 0 to priv_last_registered_vvc_idx loop
-        if priv_registered_vvc(idx).vvc_id.name    = to_upper(name) and
+        if priv_registered_vvc(idx).vvc_id.name(1 to name'length) = to_upper(name) and
           priv_registered_vvc(idx).vvc_id.instance = instance and
           priv_registered_vvc(idx).vvc_id.channel  = channel then
           return idx; -- vvc was found
@@ -282,7 +282,7 @@ package body ti_protected_types_pkg is
       variable v_match_num : natural := 0;
     begin
       for idx in 0 to priv_last_registered_vvc_idx loop
-        if priv_registered_vvc(idx).vvc_id.name     = to_upper(name) and
+        if priv_registered_vvc(idx).vvc_id.name(1 to name'length) = to_upper(name) and
           (priv_registered_vvc(idx).vvc_id.instance = instance or instance = ALL_INSTANCES) and
           (priv_registered_vvc(idx).vvc_id.channel  = channel or channel = ALL_CHANNELS) then
           if v_match_num < skip_num_of_matches then
@@ -571,25 +571,16 @@ package body ti_protected_types_pkg is
       end if;
     end function;
 
-    impure function priv_get_vvc_info_list return string is
-      variable v_line     : line;
-      variable v_line_len : integer := 1;
-      variable v_string   : string(1 to 500);
+    impure function priv_get_vvc_info_list (idx : natural := natural'low) return string is
     begin
       if priv_last_added_vvc_idx = -1 then
         alert(TB_ERROR, "priv_get_vvc_info_list() => vvc_info_list is empty!");
+        return " ";
+      elsif idx < priv_last_added_vvc_idx then
+        return "(" & priv_get_vvc_info(idx) & ")" & string'(priv_get_vvc_info_list(idx+1));
       else
-        for idx in 0 to priv_last_added_vvc_idx loop
-          write(v_line, "(" & priv_get_vvc_info(idx) & ")");
-          if idx < priv_last_added_vvc_idx then
-            write(v_line, ',');
-          end if;
-        end loop;
-        v_line_len := v_line'length;
-        v_string(1 to v_line_len) := v_line.all;
-        deallocate(v_line);
+        return "(" & priv_get_vvc_info(idx) & ")";
       end if;
-      return v_string(1 to v_line_len);
     end function;
 
     impure function priv_get_num_vvc_in_list return natural is

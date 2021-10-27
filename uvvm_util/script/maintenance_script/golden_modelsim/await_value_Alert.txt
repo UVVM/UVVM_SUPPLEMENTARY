@@ -33,143 +33,199 @@ UVVM:
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #5  ***
-UVVM:            65 ns   TB seq
-UVVM:                    await_value(unsigned x"1", 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:            87 ns   TB seq
+UVVM:                    await_value(slv x"BX" (b"1011000Z"), 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including Z, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #6  ***
-UVVM:            73 ns   TB seq
-UVVM:                    await_value(unsigned x"5", 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           116 ns   TB seq
+UVVM:                    await_value(slv x"XX" (b"1W1U1X0Z"), 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Different values, STD match including ZXUW, Fail 1'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #7  ***
-UVVM:            85 ns   TB seq
-UVVM:                    await_value(signed x"1", 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:           118 ns   TB seq
+UVVM:                    await_value(unsigned x"1", 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #8  ***
-UVVM:            93 ns   TB seq
-UVVM:                    await_value(signed x"5", 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           126 ns   TB seq
+UVVM:                    await_value(unsigned x"5", 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #9  ***
-UVVM:           105 ns   TB seq
-UVVM:                    await_value(boolean true, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:           138 ns   TB seq
+UVVM:                    await_value(signed x"1", 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #10  ***
-UVVM:           123 ns   TB seq
-UVVM:                    await_value(boolean true, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           146 ns   TB seq
+UVVM:                    await_value(signed x"5", 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #11  ***
-UVVM:           133 ns   TB seq
-UVVM:                    await_value(boolean true, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, min_time>0ns, Fail. '
+UVVM:           158 ns   TB seq
+UVVM:                    await_value(boolean true, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #12  ***
-UVVM:           135 ns   TB seq
-UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:           176 ns   TB seq
+UVVM:                    await_value(boolean true, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #13  ***
-UVVM:           153 ns   TB seq
-UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           186 ns   TB seq
+UVVM:                    await_value(boolean true, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, min_time>0ns, Fail. '
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #14  ***
-UVVM:           173 ns   TB seq
-UVVM:                    await_value(std_logic 1, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, min_time>0ns, Fail. '
+UVVM:           188 ns   TB seq
+UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #15  ***
-UVVM:           214 ns   TB seq
-UVVM:                    await_value(std_logic L, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change within time window to forced, expecting weak, FAIL'
+UVVM:           206 ns   TB seq
+UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #16  ***
-UVVM:           229 ns   TB seq
-UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change within time window to weak, expecting forced, FAIL'
+UVVM:           226 ns   TB seq
+UVVM:                    await_value(std_logic 1, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, min_time>0ns, Fail. '
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #17  ***
-UVVM:           241 ns   TB seq
-UVVM:                    await_value(integer 1, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:           267 ns   TB seq
+UVVM:                    await_value(std_logic L, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change within time window to forced, expecting weak, FAIL'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #18  ***
-UVVM:           249 ns   TB seq
-UVVM:                    await_value(integer 3, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           282 ns   TB seq
+UVVM:                    await_value(std_logic 1, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change within time window to weak, expecting forced, FAIL'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #19  ***
-UVVM:           269 ns   TB seq
-UVVM:                    await_value(integer 17, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, Min_time>0ns, Fail. '
+UVVM:           306 ns   TB seq
+UVVM:                    await_value(std_logic Z, 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including Z, Fail'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #20  ***
-UVVM:           271 ns   TB seq
-UVVM:                    await_value(real 1.000000e+00, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM:           321 ns   TB seq
+UVVM:                    await_value(std_logic Z, 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including ZXUW, Fail 2'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #21  ***
-UVVM:           279 ns   TB seq
-UVVM:                    await_value(real 3.000000e+00, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM:           336 ns   TB seq
+UVVM:                    await_value(std_logic X, 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including ZXUW, Fail 3'
 UVVM: =========================================================================================================================================================================
 UVVM: 
 UVVM: 
 UVVM: 
 UVVM: =========================================================================================================================================================================
 UVVM: ***  ERROR #22  ***
-UVVM:           299 ns   TB seq
+UVVM:           351 ns   TB seq
+UVVM:                    await_value(std_logic U, 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including ZXUW, Fail 4'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #23  ***
+UVVM:           366 ns   TB seq
+UVVM:                    await_value(std_logic W, 3 ns, 5 ns) => Failed. Condition occurred too early, after 0 ns. 'Different values, STD match including ZXUW, Fail 5'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #24  ***
+UVVM:           368 ns   TB seq
+UVVM:                    await_value(integer 1, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #25  ***
+UVVM:           376 ns   TB seq
+UVVM:                    await_value(integer 3, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #26  ***
+UVVM:           396 ns   TB seq
+UVVM:                    await_value(integer 17, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, Min_time>0ns, Fail. '
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #27  ***
+UVVM:           398 ns   TB seq
+UVVM:                    await_value(real 1.000000e+00, 3 ns, 5 ns) => Failed. Condition occurred too early, after 2 ns. 'Change too soon, Fail'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #28  ***
+UVVM:           406 ns   TB seq
+UVVM:                    await_value(real 3.000000e+00, 3 ns, 5 ns) => Failed. Timed out after 5 ns. 'Change too late, Fail'
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  ERROR #29  ***
+UVVM:           426 ns   TB seq
 UVVM:                    await_value(real 1.700000e+01, 1 ns, 2 ns) => Failed. Condition occurred too early, after 0 ns. 'Val=exp already, Min_time>0ns, Fail. '
 UVVM: =========================================================================================================================================================================
 UVVM: 
