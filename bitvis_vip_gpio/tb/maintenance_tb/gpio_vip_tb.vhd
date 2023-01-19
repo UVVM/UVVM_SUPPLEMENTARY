@@ -41,7 +41,6 @@ architecture func of gpio_vip_tb is
 
   constant C_CLK_PERIOD        : time    := 10 ns;
   constant C_SCOPE             : string  := C_TB_SCOPE_DEFAULT;
-  -- constant C_GPIO_WIDTH        : natural := 8;
   constant C_GPIO_SET_MAX_TIME : time    := 1 ps;
 
   signal gpio_1_input  : std_logic_vector(0 downto 0);
@@ -54,12 +53,7 @@ architecture func of gpio_vip_tb is
   signal gpio_7_output : std_logic_vector(7 downto 0);
   signal gpio_8_output : std_logic_vector(1023 downto 0);
   
-  -- signal gpio_9_inout  : std_logic_vector(0 downto 0);
   signal gpio_9_inout  : std_logic_vector(7 downto 0);
-  -- signal gpio_10_inout : std_logic_vector(1 downto 0);
-  -- signal gpio_11_inout : std_logic_vector(7 downto 0);
-  -- signal gpio_12_inout : std_logic_vector(1023 downto 0);
-  -- signal gpio_3_inout  : std_logic_vector(7 downto 0);  -- Temp
 
   procedure set_gpio(
     signal   pins   : out std_logic_vector;
