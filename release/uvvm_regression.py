@@ -31,9 +31,6 @@ num_minor = 0
 failing_tests_list = []
 num_tests_run = 0
 
-sim_options = "-t ps"
-
-
 class TestcaseError(Exception):
     def __init__(self, expected, actual):
         self.exp = expected
@@ -82,16 +79,11 @@ def passing():
 
 def passing_with_minor():
     print('''
-██████╗  █████╗ ███████╗███████╗    ██╗    ██╗    ██╗███╗   ███╗██╗███╗   ██╗ ██████╗ 
-██████╗ 
-██╔══██╗██╔══██╗██╔════╝██╔════╝    ██║    ██║   ██╔╝████╗ ████║██║████╗  
-██║██╔═══██╗██╔══██╗
-██████╔╝███████║███████╗███████╗    ██║ █╗ ██║  ██╔╝ ██╔████╔██║██║██╔██╗ ██║██║   
-██║██████╔╝
-██╔═══╝ ██╔══██║╚════██║╚════██║    ██║███╗██║ ██╔╝  ██║╚██╔╝██║██║██║╚██╗██║██║   
-██║██╔══██╗
-██║     ██║  ██║███████║███████║    ╚███╔███╔╝██╔╝   ██║ ╚═╝ ██║██║██║ 
-╚████║╚██████╔╝██║  ██║
+██████╗  █████╗ ███████╗███████╗    ██╗    ██╗    ██╗███╗   ███╗██╗███╗   ██╗ ██████╗ ██████╗ 
+██╔══██╗██╔══██╗██╔════╝██╔════╝    ██║    ██║   ██╔╝████╗ ████║██║████╗  ██║██╔═══██╗██╔══██╗
+██████╔╝███████║███████╗███████╗    ██║ █╗ ██║  ██╔╝ ██╔████╔██║██║██╔██╗ ██║██║   ██║██████╔╝
+██╔═══╝ ██╔══██║╚════██║╚════██║    ██║███╗██║ ██╔╝  ██║╚██╔╝██║██║██║╚██╗██║██║   ██║██╔══██╗
+██║     ██║  ██║███████║███████║    ╚███╔███╔╝██╔╝   ██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝██║  ██║
 ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝     ╚══╝╚══╝ ╚═╝    ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  
 ╚═╝''')
 
@@ -177,6 +169,13 @@ def clear_sim_folder():
         shutil.rmtree('./hdlregression')
 
 
+def get_sim_options(hr):
+  if hr.settings.get_simulator_name() == 'MODELSIM':
+    return '-t ps'
+  else:
+    return None
+
+
 def add_uvvm_basic_files(hr):
     hr.add_files("../uvvm_util/src/*.vhd", "uvvm_util")
     hr.add_files("../uvvm_vvc_framework/src/*.vhd", "uvvm_vvc_framework")
@@ -213,7 +212,7 @@ def test_bitvis_uart():
     # Add TB/TH
     hr.add_files("../bitvis_uart/tb/maintenance_tb/*.vhd", "bitvis_uart")
     hr.add_files("../bitvis_uart/tb/*.vhd", "bitvis_uart")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=9, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -234,7 +233,7 @@ def test_bitvis_irqc():
     # Add TB/TH
     hr.add_files("../bitvis_irqc/tb/*.vhd", "bitvis_irqc")
     hr.add_files("../bitvis_irqc/tb/maintenance_tb/*.vhd", "bitvis_irqc")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -251,7 +250,7 @@ def test_bitvis_vip_avalon_mm():
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_avalon_mm")
     # Add TB/TH etc
     hr.add_files("../bitvis_vip_avalon_mm/tb/maintenance_tb/*.vhd", "bitvis_vip_avalon_mm")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=4, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -314,7 +313,7 @@ def test_bitvis_vip_avalon_st():
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_avalon_st")
     # Add TB/TH
     hr.add_files("../bitvis_vip_avalon_st/tb/maintenance_tb/*.vhd", "bitvis_vip_avalon_st")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=created_tests, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -331,7 +330,7 @@ def test_bitvis_vip_axi():
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_axi")
     # Add TB/TH
     hr.add_files("../bitvis_vip_axi/tb/maintenance_tb/*.vhd", "bitvis_vip_axi")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -348,7 +347,7 @@ def test_bitvis_vip_axilite():
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_axilite")
     # Add TB/TH
     hr.add_files("../bitvis_vip_axilite/tb/maintenance_tb/*.vhd", "bitvis_vip_axilite")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -440,7 +439,7 @@ use_setup_and_hold):
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_axistream")
     # Add TB/TH
     hr.add_files("../bitvis_vip_axistream/tb/maintenance_tb/*.vhd", "bitvis_vip_axistream")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=created_testcases, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -458,7 +457,7 @@ def test_bitvis_vip_clock_generator():
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_clock_generator")
     # Add TB/TH
     hr.add_files("../bitvis_vip_clock_generator/tb/maintenance_tb/*.vhd", "bitvis_vip_clock_generator")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=1, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -476,7 +475,7 @@ def test_bitvis_vip_error_injection():
     hr.add_files("../bitvis_vip_error_injection/tb/maintenance_tb/*.vhd", "bitvis_vip_error_injection")
     hr.add_files("../bitvis_vip_error_injection/tb/*.vhd", "bitvis_vip_error_injection")
     sim_options = "-t ns"
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options='-t ns')
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -494,7 +493,7 @@ def test_bitvis_vip_gmii():
     # Add TB/TH
     hr.add_files("../bitvis_vip_gmii/tb/maintenance_tb/*.vhd", "bitvis_vip_gmii")
     hr.add_files("../bitvis_vip_gmii/tb/*.vhd", "bitvis_vip_gmii")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -512,7 +511,7 @@ def test_bitvis_vip_gpio():
     # Add TB/TH
     hr.add_files("../bitvis_vip_gpio/tb/maintenance_tb/*.vhd", "bitvis_vip_gpio")
     hr.add_files("../bitvis_vip_gpio/tb/*.vhd", "bitvis_vip_gpio")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=1, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -538,7 +537,7 @@ def test_bitvis_vip_i2c():
     # Add Wishbone VIP
     hr.add_files("../bitvis_vip_wishbone/src/*.vhd", "bitvis_vip_wishbone")
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_wishbone")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=21, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -556,7 +555,7 @@ def test_bitvis_vip_rgmii():
     # Add TB/TH
     hr.add_files("../bitvis_vip_rgmii/tb/maintenance_tb/*.vhd", "bitvis_vip_rgmii")
     hr.add_files("../bitvis_vip_rgmii/tb/*.vhd", "bitvis_vip_rgmii")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=2, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -574,7 +573,7 @@ def test_bitvis_vip_sbi():
     # Add TB/TH
     hr.add_files("../bitvis_vip_sbi/tb/maintenance_tb/*.vhd", "bitvis_vip_sbi")
     hr.add_files("../bitvis_vip_sbi/tb/*.vhd", "bitvis_vip_sbi")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=11, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -595,7 +594,7 @@ def test_bitvis_vip_scoreboard():
     # Add TB/TH
     hr.add_files("../bitvis_vip_scoreboard/tb/maintenance_tb/*.vhd", "bitvis_vip_scoreboard_tb")
     hr.add_files("../bitvis_vip_scoreboard/tb/*.vhd", "bitvis_vip_scoreboard_tb")
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=3, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -618,14 +617,14 @@ def test_bitvis_vip_spec_cov():
     hr.add_files("../bitvis_vip_spec_cov/tb/*.vhd", "bitvis_vip_spec_cov")
 
     hr.add_generics(entity="spec_cov_tb",
-                         generics=["GC_REQ_FILE",     ("../bitvis_vip_spec_cov/tb/maintenance_tb/req_file.csv", "PATH"),
-                                   "GC_SUB_REQ_FILE", ("../bitvis_vip_spec_cov/tb/maintenance_tb/sub_req_file.csv", "PATH"),
-                                   "GC_SUB_REQ_FILE", ("../bitvis_vip_spec_cov/tb/maintenance_tb/sub_req_file.csv", "PATH"),
-                                   "GC_REQ_OMIT_MAP", ("../bitvis_vip_spec_cov/tb/maintenance_tb/sub_req_omit_map_file.csv", "PATH")])
+                         generics=["GC_REQ_FILE",       ("../bitvis_vip_spec_cov/tb/maintenance_tb/req_file.csv", "PATH"),
+                                   "GC_REQ_FILE_EMPTY", ("../bitvis_vip_spec_cov/tb/maintenance_tb/req_file_empty.csv", "PATH"),
+                                   "GC_SUB_REQ_FILE",   ("../bitvis_vip_spec_cov/tb/maintenance_tb/sub_req_file.csv", "PATH"),
+                                   "GC_REQ_OMIT_MAP",   ("../bitvis_vip_spec_cov/tb/maintenance_tb/sub_req_omit_map_file.csv", "PATH")])
 
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
-    check_result(exp_pass=18, exp_fail=1, exp_minor=0, hr=hr)
+    check_result(exp_pass=20, exp_fail=1, exp_minor=0, hr=hr)
 
 
 def test_bitvis_vip_spi():
@@ -665,7 +664,7 @@ def test_bitvis_vip_spi():
     hr.add_files("../bitvis_vip_sbi/src/*.vhd", "bitvis_vip_sbi")
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_sbi")
 
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=total_testcases, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -693,7 +692,7 @@ def test_bitvis_vip_uart():
     hr.add_files("../bitvis_vip_sbi/src/*.vhd", "bitvis_vip_sbi")
     hr.add_files("../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_vip_sbi")
 
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=3, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -729,7 +728,7 @@ def test_bitvis_vip_ethernet():
     hr.add_files("../bitvis_vip_ethernet/tb/maintenance_tb/ethernet_mac-master/generic/*.vhd", "mac_master")
     hr.add_files("../bitvis_vip_ethernet/tb/maintenance_tb/ethernet_mac-master/xilinx/ipcore_dir/*.vhd", "mac_master")
 
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=4, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -764,7 +763,7 @@ def test_uvvm_util():
                          architecture='func',
                          generics=['GC_FILE_PATH', (output_path, 'PATH')])
 
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options=get_sim_options(hr))
 
     check_result(exp_pass=51, exp_fail=0, exp_minor=0, hr=hr)
 
@@ -805,7 +804,7 @@ def test_uvvm_vvc_framework():
     hr.add_files("../uvvm_vvc_framework/tb/maintenance_tb/reference_vvcs/src/*uart*.vhd", "bitvis_vip_uart")
     hr.add_files("../uvvm_vvc_framework/tb/maintenance_tb/*.vhd", "testbench_lib")
     sim_options = "-t ns"
-    hr.start(sim_options=sim_options)
+    hr.start(sim_options='-t ns')
 
     check_result(exp_pass=11, exp_fail=0, exp_minor=0, hr=hr)
 

@@ -76,6 +76,7 @@ begin
     variable v_std_deviation : real;
     variable v_found         : boolean                        := false;
     variable v_incr_list     : integer_vector(1 to 256);
+    variable v_range_uns_vec : t_range_uns_vec(0 to 0)(0 to 1)(127 downto 0);
 
   begin
     -- To avoid that log files from different test cases (run in separate
@@ -91,7 +92,7 @@ begin
 
     --===================================================================================
     if GC_TESTCASE = "rand_basic" then
-      --===================================================================================
+    --===================================================================================
       increment_expected_alerts(TB_WARNING, 1); -- Single warning for using same specifier in rand()
 
       v_rand.set_name("long_string_abcdefghijklmnopqrstuvwxyz");
@@ -575,6 +576,8 @@ begin
       ------------------------------------------------------------
       -- Time
       ------------------------------------------------------------
+      check_value(std.env.resolution_limit, ps, TB_FAILURE, "Simulator time resolution must be set to 'ps' for this testcase");
+
       log(ID_LOG_HDR, "Testing time (range)");
       v_num_values := 5;
       for i in 1 to v_num_values * C_NUM_RAND_REPETITIONS loop
@@ -1326,7 +1329,8 @@ begin
       v_slv_long_max := x"0F000000000000000000000000000008";
       for i in 1 to v_num_values * C_NUM_RAND_REPETITIONS loop
         v_slv_long := v_rand.rand(v_slv_long'length, v_slv_long_min, v_slv_long_max);
-        check_rand_value_long(unsigned(v_slv_long), (0 => (unsigned(v_slv_long_min), unsigned(v_slv_long_max))));
+        v_range_uns_vec(0) := (unsigned(v_slv_long_min), unsigned(v_slv_long_max));
+        check_rand_value_long(unsigned(v_slv_long), v_range_uns_vec);
         count_rand_value(v_value_cnt, unsigned(v_slv_long) - unsigned(v_slv_long_min));
       end loop;
       check_uniform_distribution(v_value_cnt, v_num_values);
@@ -1336,7 +1340,8 @@ begin
       v_slv_long_max := x"00F00000000000000000000000000003";
       for i in 1 to v_num_values * C_NUM_RAND_REPETITIONS loop
         v_slv_long := v_rand.rand(v_slv_long_min, v_slv_long_max);
-        check_rand_value_long(unsigned(v_slv_long), (0 => (unsigned(v_slv_long_min), unsigned(v_slv_long_max))));
+        v_range_uns_vec(0) := (unsigned(v_slv_long_min), unsigned(v_slv_long_max));
+        check_rand_value_long(unsigned(v_slv_long), v_range_uns_vec);        
         count_rand_value(v_value_cnt, unsigned(v_slv_long) - unsigned(v_slv_long_min));
       end loop;
       check_uniform_distribution(v_value_cnt, v_num_values);
@@ -1557,7 +1562,9 @@ begin
 
     --===================================================================================
     elsif GC_TESTCASE = "rand_weighted" then
-      --===================================================================================
+    --===================================================================================
+      check_value(std.env.resolution_limit, ps, TB_FAILURE, "Simulator time resolution must be set to 'ps' for this testcase");
+
       log(ID_SEQUENCER, "Reducing log messages from rand_pkg");
       disable_log_msg(ID_LOG_MSG_CTRL);
 
@@ -1975,7 +1982,7 @@ begin
 
     --===================================================================================
     elsif GC_TESTCASE = "rand_cyclic" then
-      --===================================================================================
+    --===================================================================================
       ------------------------------------------------------------
       -- Random cyclic integer
       ------------------------------------------------------------
@@ -2532,7 +2539,7 @@ begin
 
     --===================================================================================
     elsif GC_TESTCASE = "rand_cyclic_performance" then
-      --===================================================================================
+    --===================================================================================
       ------------------------------------------------------------
       log(ID_LOG_HDR, "Testing random cyclic large ranges");
       ------------------------------------------------------------
@@ -2588,7 +2595,7 @@ begin
 
     --===================================================================================
     elsif GC_TESTCASE = "rand_report" then
-      --===================================================================================
+    --===================================================================================
       v_rand.report_config(VOID);
 
       v_rand.set_name("MY_RAND_GEN");
@@ -2602,7 +2609,7 @@ begin
 
     --===================================================================================
     elsif GC_TESTCASE = "rand_gaussian" then
-      --===================================================================================
+    --===================================================================================
       ------------------------------------------------------------
       log(ID_LOG_HDR, "Testing Gaussian distribution config");
       ------------------------------------------------------------
