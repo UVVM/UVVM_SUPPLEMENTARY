@@ -18,11 +18,11 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library uvvm_util;
-context uvvm_util.uvvm_util_context;
-
 library std;
 use std.textio.all;
+
+library uvvm_util;
+context uvvm_util.uvvm_util_context;
 
 --================================================================================================================================
 --================================================================================================================================
@@ -31,7 +31,7 @@ package avalon_st_bfm_pkg is
   --==========================================================================================
   -- Types and constants for AVALON_ST BFM
   --==========================================================================================
-  constant C_SCOPE : string := "AVALON_ST BFM";
+  constant C_BFM_SCOPE : string := "AVALON_ST BFM";
 
   constant C_MAX_BITS_PER_SYMBOL  : positive := 512; -- Recommended maximum in protocol specification (MNL-AVABUSREF)
   constant C_MAX_SYMBOLS_PER_BEAT : positive := 32; -- Recommended maximum in protocol specification (MNL-AVABUSREF)
@@ -109,7 +109,7 @@ package avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   );
@@ -119,7 +119,7 @@ package avalon_st_bfm_pkg is
     constant msg          : in string                 := "";
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   );
@@ -134,7 +134,7 @@ package avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT;
     constant ext_proc_call : in string                 := "" -- External proc_call. Overwrite if called from another BFM procedure
@@ -145,7 +145,7 @@ package avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT;
     constant ext_proc_call : in string                 := "" -- External proc_call. Overwrite if called from another BFM procedure
@@ -161,7 +161,7 @@ package avalon_st_bfm_pkg is
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
     constant alert_level  : in t_alert_level          := error;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   );
@@ -172,7 +172,7 @@ package avalon_st_bfm_pkg is
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
     constant alert_level  : in t_alert_level          := error;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   );
@@ -231,7 +231,7 @@ package body avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   ) is
@@ -395,7 +395,7 @@ package body avalon_st_bfm_pkg is
     constant msg          : in string                 := "";
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   ) is
@@ -414,7 +414,7 @@ package body avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT;
     constant ext_proc_call : in string                 := "" -- External proc_call. Overwrite if called from another BFM procedure
@@ -623,7 +623,7 @@ package body avalon_st_bfm_pkg is
     constant msg           : in string                 := "";
     signal   clk           : in std_logic;
     signal   avalon_st_if  : inout t_avalon_st_if;
-    constant scope         : in string                 := C_SCOPE;
+    constant scope         : in string                 := C_BFM_SCOPE;
     constant msg_id_panel  : in t_msg_id_panel         := shared_msg_id_panel;
     constant config        : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT;
     constant ext_proc_call : in string                 := "" -- External proc_call. Overwrite if called from another BFM procedure
@@ -643,7 +643,7 @@ package body avalon_st_bfm_pkg is
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
     constant alert_level  : in t_alert_level          := error;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   ) is
@@ -688,14 +688,35 @@ package body avalon_st_bfm_pkg is
     end loop;
 
     -- Done. Report result
-    if v_data_error_cnt /= 0 then
-      -- Use binary representation when mismatch is due to weak signals
-      v_alert_radix := BIN when config.match_strictness = MATCH_EXACT and check_value(v_rx_data_array(v_first_wrong_symbol), v_normalized_data(v_first_wrong_symbol), MATCH_STD, NO_ALERT, msg, scope, HEX_BIN_IF_INVALID, KEEP_LEADING_0, ID_NEVER) else HEX;
-      alert(alert_level, proc_call & "=> Failed in " & to_string(v_data_error_cnt) & " data bits. First mismatch in symbol# " & to_string(v_first_wrong_symbol) & ". Was " & to_string(v_rx_data_array(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_data(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & "." & LF & add_msg_delimiter(msg), scope);
-    elsif v_channel_error then
-      alert(alert_level, proc_call & "=> Failed. Wrong channel. Was " & to_string(v_rx_channel, HEX, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_chan, HEX, AS_IS, INCL_RADIX) & ". " & msg, scope);
-    else
-      log(config.id_for_bfm, proc_call & "=> OK, received " & to_string(v_rx_data_array'length) & " symbols. " & add_msg_delimiter(msg), scope, msg_id_panel);
+    if C_ERROR_REPORT_EXTENT = EXTENDED then
+      if v_data_error_cnt /= 0 then
+        -- Use binary representation when mismatch is due to weak signals
+        v_alert_radix := BIN when config.match_strictness = MATCH_EXACT and check_value(v_rx_data_array(v_first_wrong_symbol), v_normalized_data(v_first_wrong_symbol), MATCH_STD, 
+          NO_ALERT, msg, scope, HEX_BIN_IF_INVALID, KEEP_LEADING_0, ID_NEVER) else HEX;
+        alert(alert_level, proc_call & "=> Failed in " & to_string(v_data_error_cnt) & " data bits. First mismatch in symbol# " & to_string(v_first_wrong_symbol+1) & ". Was " & 
+          to_string(v_rx_data_array(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_data(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & 
+          "." & LF & "Was:" & LF & to_string(v_rx_data_array, v_alert_radix, AS_IS) & LF & "Expected:" & LF & to_string(v_normalized_data, v_alert_radix, AS_IS) & LF & 
+          add_msg_delimiter(msg), scope);
+      elsif v_channel_error then
+        alert(alert_level, proc_call & "=> Failed. Wrong channel. Was " & to_string(v_rx_channel, HEX, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_chan, HEX, AS_IS, INCL_RADIX) & 
+        ". " & msg, scope);
+      else
+        log(config.id_for_bfm, proc_call & "=> OK, received " & to_string(v_rx_data_array'length) & " symbols. " & add_msg_delimiter(msg), scope, msg_id_panel);
+      end if;
+    elsif C_ERROR_REPORT_EXTENT = BRIEF then
+      if v_data_error_cnt /= 0 then
+        -- Use binary representation when mismatch is due to weak signals
+        v_alert_radix := BIN when config.match_strictness = MATCH_EXACT and check_value(v_rx_data_array(v_first_wrong_symbol), v_normalized_data(v_first_wrong_symbol), MATCH_STD, 
+          NO_ALERT, msg, scope, HEX_BIN_IF_INVALID, KEEP_LEADING_0, ID_NEVER) else HEX;
+        alert(alert_level, proc_call & "=> Failed in " & to_string(v_data_error_cnt) & " data bits. First mismatch in symbol# " & to_string(v_first_wrong_symbol+1) & ". Was " & 
+          to_string(v_rx_data_array(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_data(v_first_wrong_symbol), v_alert_radix, AS_IS, INCL_RADIX) & 
+          "." & LF & add_msg_delimiter(msg), scope);
+      elsif v_channel_error then
+        alert(alert_level, proc_call & "=> Failed. Wrong channel. Was " & to_string(v_rx_channel, HEX, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_chan, HEX, AS_IS, INCL_RADIX) & 
+        ". " & msg, scope);
+      else
+        log(config.id_for_bfm, proc_call & "=> OK, received " & to_string(v_rx_data_array'length) & " symbols. " & add_msg_delimiter(msg), scope, msg_id_panel);
+      end if;
     end if;
   end procedure;
 
@@ -708,7 +729,7 @@ package body avalon_st_bfm_pkg is
     signal   clk          : in std_logic;
     signal   avalon_st_if : inout t_avalon_st_if;
     constant alert_level  : in t_alert_level          := error;
-    constant scope        : in string                 := C_SCOPE;
+    constant scope        : in string                 := C_BFM_SCOPE;
     constant msg_id_panel : in t_msg_id_panel         := shared_msg_id_panel;
     constant config       : in t_avalon_st_bfm_config := C_AVALON_ST_BFM_CONFIG_DEFAULT
   ) is

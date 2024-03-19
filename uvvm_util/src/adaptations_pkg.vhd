@@ -172,10 +172,13 @@ package adaptations_pkg is
     -- SB package
     ID_DATA,                            -- To write general handling of data
     ID_CTRL,                            -- To write general control/config information
-    -- Specification vs Verification IDs
+    -- Specification requirement coverage
+    ID_SPEC_COV_INIT,                   -- Used for logging specification requirement coverage initialization
+    ID_SPEC_COV_REQS,                   -- Used for logging the specification requirement list
+    ID_SPEC_COV,                        -- Used for logging general specification requirement coverage methods
+    -- File handling
     ID_FILE_OPEN_CLOSE,                 -- Id used when opening / closing file
     ID_FILE_PARSER,                     -- Id used in file parsers
-    ID_SPEC_COV,                        -- Messages from the specification coverage methods
     -- Special purpose - Not really IDs
     ALL_MESSAGES                        -- Applies to ALL message ID apart from ID_NEVER
   );
@@ -219,6 +222,11 @@ package adaptations_pkg is
   );
 
   constant C_MSG_DELIMITER : character := ''';
+
+  -- Switch for setting the extent of error reports in mismatched stream data. Options are EXTENDED and BRIEF,
+  -- where EXTENDED prints all received data with error, and BRIEF exclusively prints first mismatched word.
+  -- Applies to RGMII, GMII, Avalon_st and Axistream
+  constant C_ERROR_REPORT_EXTENT : t_error_report_extent := EXTENDED;
 
   --------------------------------------------------------------------------------------------------------------------------------
   -- Alert counters
@@ -281,12 +289,12 @@ package adaptations_pkg is
   --------------------------------------------------------------------------------------------------------------------------------
   signal global_show_msg_for_uvvm_cmd : boolean := true; -- If true, the msg parameter for the commands using the msg_id ID_UVVM_SEND_CMD will be shown
 
-  constant C_CMD_QUEUE_COUNT_MAX                   : natural       := 20; -- (VVC Command queue)  May be overwritten for dedicated VVC
+  constant C_CMD_QUEUE_COUNT_MAX                   : natural       := 1000; -- (VVC Command queue)  May be overwritten for dedicated VVC
   constant C_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY    : t_alert_level := WARNING;
-  constant C_CMD_QUEUE_COUNT_THRESHOLD             : natural       := 18;
-  constant C_RESULT_QUEUE_COUNT_MAX                : natural       := 20; -- (VVC Result queue)  May be overwritten for dedicated VVC
+  constant C_CMD_QUEUE_COUNT_THRESHOLD             : natural       := 950;
+  constant C_RESULT_QUEUE_COUNT_MAX                : natural       := 1000; -- (VVC Result queue)  May be overwritten for dedicated VVC
   constant C_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY : t_alert_level := WARNING;
-  constant C_RESULT_QUEUE_COUNT_THRESHOLD          : natural       := 18;
+  constant C_RESULT_QUEUE_COUNT_THRESHOLD          : natural       := 950;
   constant C_MAX_VVC_INSTANCE_NUM                  : natural       := 10;
   constant C_MAX_NUM_SEQUENCERS                    : natural       := 10; -- Max number of sequencers
   constant C_MAX_TB_VVC_NUM                        : natural       := 20; -- Max number of VVCs in testbench (including all channels)

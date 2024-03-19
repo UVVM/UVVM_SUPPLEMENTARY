@@ -37,12 +37,12 @@ entity clock_generator_vvc is
     GC_CLOCK_NAME                            : string        := "clk";
     GC_CLOCK_PERIOD                          : time          := 10 ns;
     GC_CLOCK_HIGH_TIME                       : time          := 5 ns;
-    GC_CMD_QUEUE_COUNT_MAX                   : natural       := 1000;
-    GC_CMD_QUEUE_COUNT_THRESHOLD             : natural       := 950;
-    GC_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY    : t_alert_level := WARNING;
-    GC_RESULT_QUEUE_COUNT_MAX                : natural       := 1000;
-    GC_RESULT_QUEUE_COUNT_THRESHOLD          : natural       := 950;
-    GC_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY : t_alert_level := warning
+    GC_CMD_QUEUE_COUNT_MAX                   : natural       := C_CMD_QUEUE_COUNT_MAX;
+    GC_CMD_QUEUE_COUNT_THRESHOLD             : natural       := C_CMD_QUEUE_COUNT_THRESHOLD;
+    GC_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY    : t_alert_level := C_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY;
+    GC_RESULT_QUEUE_COUNT_MAX                : natural       := C_RESULT_QUEUE_COUNT_MAX;
+    GC_RESULT_QUEUE_COUNT_THRESHOLD          : natural       := C_RESULT_QUEUE_COUNT_THRESHOLD;
+    GC_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY : t_alert_level := C_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY
   );
   port(
     clk : out std_logic
@@ -55,7 +55,7 @@ end entity clock_generator_vvc;
 --========================================================================================================================
 architecture behave of clock_generator_vvc is
 
-  constant C_SCOPE      : string       := C_VVC_NAME & "," & to_string(GC_INSTANCE_IDX);
+  constant C_SCOPE      : string       := get_scope_for_log(C_VVC_NAME, GC_INSTANCE_IDX);
   constant C_VVC_LABELS : t_vvc_labels := assign_vvc_labels(C_SCOPE, C_VVC_NAME, GC_INSTANCE_IDX, NA);
 
   signal executor_is_busy                   : boolean := false;
@@ -169,7 +169,7 @@ begin
             work.td_vvc_entity_support_pkg.interpreter_flush_command_queue(v_local_vvc_cmd, command_queue, vvc_config, vvc_status, C_VVC_LABELS);
 
           when TERMINATE_CURRENT_COMMAND =>
-            work.td_vvc_entity_support_pkg.interpreter_terminate_current_command(v_local_vvc_cmd, vvc_config, C_VVC_LABELS, terminate_current_cmd);
+            work.td_vvc_entity_support_pkg.interpreter_terminate_current_command(v_local_vvc_cmd, vvc_config, C_VVC_LABELS, terminate_current_cmd, executor_is_busy);
 
           when others =>
             tb_error("Unsupported command received for IMMEDIATE execution: '" & to_string(v_local_vvc_cmd.operation) & "'", C_SCOPE);
@@ -187,6 +187,7 @@ begin
       end if;
 
     end loop;
+    wait;
   end process;
   --========================================================================================================================
 

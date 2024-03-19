@@ -89,6 +89,7 @@ package types_pkg is
   type t_when_to_start_transfer is (START_TRANSFER_IMMEDIATE, START_TRANSFER_ON_NEXT_SS);
   type t_action_between_words is (RELEASE_LINE_BETWEEN_WORDS, HOLD_LINE_BETWEEN_WORDS);
 
+  -- FIRST_BYTE_LEFT and FIRST_BYTE_RIGHT are deprecated and will be removed in next major release
   type t_byte_endianness is (LOWER_BYTE_LEFT, LOWER_BYTE_RIGHT, LOWER_WORD_LEFT, LOWER_WORD_RIGHT, FIRST_BYTE_LEFT, FIRST_BYTE_RIGHT);
   alias t_word_endianness is t_byte_endianness;
 
@@ -190,6 +191,10 @@ package types_pkg is
   -------------------------------------
   type t_transaction_result is (ACK, NAK, ERROR); -- add more when needed
 
+  -- Transaction status FAILED and SUCCEEDED are only applicable for Monitor Transaction Info records and not for VVC Transaction Info records.
+  -- Whereas COMPLETED is applicable only for VVCs and not Monitors.
+  type t_transaction_status is (INACTIVE, IN_PROGRESS, FAILED, SUCCEEDED, COMPLETED);
+
   type t_hierarchy_alert_level_print is array (NOTE to t_alert_level'right) of boolean;
 
   type t_hierarchy_node is record
@@ -227,6 +232,8 @@ package types_pkg is
   type t_activity is (ACTIVE, INACTIVE);
 
   type t_extent_tickoff is (LIST_SINGLE_TICKOFF, LIST_EVERY_TICKOFF);
+
+  type t_error_report_extent is (EXTENDED, BRIEF);
 
   -------------------------------------
   -- SB

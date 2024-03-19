@@ -30,12 +30,12 @@ use bitvis_vip_scoreboard.generic_sb_support_pkg.C_SB_CONFIG_DEFAULT;
 use work.spi_bfm_pkg.all;
 use work.vvc_methods_pkg.all;
 use work.vvc_cmd_pkg.all;
-use work.td_vvc_framework_common_methods_pkg.all;
 use work.td_target_support_pkg.all;
 use work.td_vvc_entity_support_pkg.all;
 use work.td_cmd_queue_pkg.all;
 use work.td_result_queue_pkg.all;
 use work.transaction_pkg.all;
+use work.vvc_sb_support_pkg.all;
 
 --=================================================================================================
 entity spi_vvc is
@@ -45,12 +45,12 @@ entity spi_vvc is
     GC_INSTANCE_IDX                          : natural          := 1; -- Instance index for this SPI_VVCT instance
     GC_MASTER_MODE                           : boolean          := true;
     GC_SPI_CONFIG                            : t_spi_bfm_config := C_SPI_BFM_CONFIG_DEFAULT; -- Behavior specification for BFM
-    GC_CMD_QUEUE_COUNT_MAX                   : natural          := 1000;
-    GC_CMD_QUEUE_COUNT_THRESHOLD             : natural          := 950;
-    GC_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY    : t_alert_level    := warning;
-    GC_RESULT_QUEUE_COUNT_MAX                : natural          := 1000;
-    GC_RESULT_QUEUE_COUNT_THRESHOLD          : natural          := 950;
-    GC_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY : t_alert_level    := warning
+    GC_CMD_QUEUE_COUNT_MAX                   : natural          := C_CMD_QUEUE_COUNT_MAX;
+    GC_CMD_QUEUE_COUNT_THRESHOLD             : natural          := C_CMD_QUEUE_COUNT_THRESHOLD;
+    GC_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY    : t_alert_level    := C_CMD_QUEUE_COUNT_THRESHOLD_SEVERITY;
+    GC_RESULT_QUEUE_COUNT_MAX                : natural          := C_RESULT_QUEUE_COUNT_MAX;
+    GC_RESULT_QUEUE_COUNT_THRESHOLD          : natural          := C_RESULT_QUEUE_COUNT_THRESHOLD;
+    GC_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY : t_alert_level    := C_RESULT_QUEUE_COUNT_THRESHOLD_SEVERITY
   );
   port(
     spi_vvc_if : inout t_spi_if := init_spi_if_signals(GC_SPI_CONFIG, GC_MASTER_MODE)
@@ -62,7 +62,7 @@ end entity spi_vvc;
 
 architecture behave of spi_vvc is
 
-  constant C_SCOPE      : string       := C_VVC_NAME & "," & to_string(GC_INSTANCE_IDX);
+  constant C_SCOPE      : string       := get_scope_for_log(C_VVC_NAME, GC_INSTANCE_IDX);
   constant C_VVC_LABELS : t_vvc_labels := assign_vvc_labels(C_SCOPE, C_VVC_NAME, GC_INSTANCE_IDX, NA);
 
   signal executor_is_busy      : boolean := false;
@@ -184,7 +184,7 @@ begin
             work.td_vvc_entity_support_pkg.interpreter_flush_command_queue(v_local_vvc_cmd, command_queue, vvc_config, vvc_status, C_VVC_LABELS);
 
           when TERMINATE_CURRENT_COMMAND =>
-            work.td_vvc_entity_support_pkg.interpreter_terminate_current_command(v_local_vvc_cmd, vvc_config, C_VVC_LABELS, terminate_current_cmd);
+            work.td_vvc_entity_support_pkg.interpreter_terminate_current_command(v_local_vvc_cmd, vvc_config, C_VVC_LABELS, terminate_current_cmd, executor_is_busy);
 
           when FETCH_RESULT =>
             work.td_vvc_entity_support_pkg.interpreter_fetch_result(result_queue, v_local_vvc_cmd, vvc_config, C_VVC_LABELS, last_cmd_idx_executed, shared_vvc_response);
@@ -211,6 +211,7 @@ begin
       end if;
 
     end loop;
+    wait;
   end process;
   --===============================================================================================
 
@@ -300,7 +301,7 @@ begin
         when MASTER_TRANSMIT_AND_RECEIVE =>
           if GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             transaction_info.tx_data := v_cmd.data;
 
@@ -341,6 +342,9 @@ begin
                                                             result       => v_result(i));
               end if;
             end loop;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, v_result, COMPLETED, C_SCOPE);
           else                          -- attempted master transmit and receive when in slave mode
             alert(error, "Master transmit and receive called when VVC is in slave mode.", C_SCOPE);
           end if;
@@ -348,7 +352,7 @@ begin
         when MASTER_TRANSMIT_AND_CHECK =>
           if GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             transaction_info.tx_data := v_cmd.data;
             -- Call the corresponding procedure in the BFM package.
@@ -377,6 +381,8 @@ begin
                                             config                       => vvc_config.bfm_config);
             end if;
 
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted master transmit and receive when in slave mode
             alert(error, "Master transmit and check called when VVC is in slave mode.", C_SCOPE);
           end if;
@@ -384,7 +390,7 @@ begin
         when MASTER_TRANSMIT_ONLY =>
           if GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             transaction_info.tx_data := v_cmd.data;
             -- Call the corresponding procedure in the BFM package.
@@ -408,8 +414,10 @@ begin
                                   scope                        => C_SCOPE,
                                   msg_id_panel                 => v_msg_id_panel,
                                   config                       => vvc_config.bfm_config);
-
             end if;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted master transmit when in slave mode
             alert(error, "Master transmit called when VVC is in slave mode.", C_SCOPE);
           end if;
@@ -417,7 +425,7 @@ begin
         when MASTER_RECEIVE_ONLY =>
           if GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
@@ -452,6 +460,8 @@ begin
               end if;
             end loop;
 
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, v_result, COMPLETED, C_SCOPE);
           else                          -- attempted master receive when in slave mode
             alert(error, "Master receive called when VVC is in slave mode.", C_SCOPE);
           end if;
@@ -459,7 +469,7 @@ begin
         when MASTER_CHECK_ONLY =>
           if GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
@@ -485,6 +495,9 @@ begin
                                msg_id_panel                 => v_msg_id_panel,
                                config                       => vvc_config.bfm_config);
             end if;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted master check when in slave mode
             alert(error, "Master check called when VVC is in slave mode.", C_SCOPE);
           end if;
@@ -492,7 +505,7 @@ begin
         when SLAVE_TRANSMIT_AND_RECEIVE =>
           if not GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             transaction_info.tx_data := v_cmd.data;
             -- Call the corresponding procedure in the BFM package.
@@ -501,6 +514,7 @@ begin
                                              rx_data                => v_result(0)(GC_DATA_WIDTH - 1 downto 0),
                                              msg                    => format_msg(v_cmd),
                                              spi_if                 => spi_vvc_if,
+                                             terminate_access       => terminate_current_cmd.is_active,
                                              when_to_start_transfer => v_cmd.when_to_start_transfer,
                                              scope                  => C_SCOPE,
                                              msg_id_panel           => v_msg_id_panel,
@@ -513,6 +527,7 @@ begin
                                              rx_data                => v_data_receive(v_num_words - 1 downto 0),
                                              msg                    => format_msg(v_cmd),
                                              spi_if                 => spi_vvc_if,
+                                             terminate_access       => terminate_current_cmd.is_active,
                                              when_to_start_transfer => v_cmd.when_to_start_transfer,
                                              scope                  => C_SCOPE,
                                              msg_id_panel           => v_msg_id_panel,
@@ -531,6 +546,9 @@ begin
                                                             result       => v_result(i));
               end if;
             end loop;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, v_result, COMPLETED, C_SCOPE);
           else                          -- attempted slave transmit when in master mode
             alert(note, "Slave transmit and receive called when VVC is in master mode.", C_SCOPE);
           end if;
@@ -538,7 +556,7 @@ begin
         when SLAVE_TRANSMIT_AND_CHECK =>
           if not GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
@@ -546,6 +564,7 @@ begin
                                            data_exp               => v_cmd.data_exp(0)(GC_DATA_WIDTH - 1 downto 0),
                                            msg                    => format_msg(v_cmd),
                                            spi_if                 => spi_vvc_if,
+                                           terminate_access       => terminate_current_cmd.is_active,
                                            alert_level            => v_cmd.alert_level,
                                            when_to_start_transfer => v_cmd.when_to_start_transfer,
                                            scope                  => C_SCOPE,
@@ -560,6 +579,7 @@ begin
                                            data_exp               => v_normalized_data_exp(v_num_words - 1 downto 0),
                                            msg                    => format_msg(v_cmd),
                                            spi_if                 => spi_vvc_if,
+                                           terminate_access       => terminate_current_cmd.is_active,
                                            alert_level            => v_cmd.alert_level,
                                            when_to_start_transfer => v_cmd.when_to_start_transfer,
                                            scope                  => C_SCOPE,
@@ -567,6 +587,8 @@ begin
                                            config                 => vvc_config.bfm_config);
             end if;
 
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted slave transmit when in master mode
             alert(error, "Slave transmit and check called when VVC is in master mode.", C_SCOPE);
           end if;
@@ -574,13 +596,14 @@ begin
         when SLAVE_TRANSMIT_ONLY =>
           if not GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
               spi_slave_transmit(tx_data                => v_cmd.data(0)(GC_DATA_WIDTH - 1 downto 0),
                                  msg                    => format_msg(v_cmd),
                                  spi_if                 => spi_vvc_if,
+                                 terminate_access       => terminate_current_cmd.is_active,
                                  when_to_start_transfer => v_cmd.when_to_start_transfer,
                                  scope                  => C_SCOPE,
                                  msg_id_panel           => v_msg_id_panel,
@@ -592,11 +615,15 @@ begin
               spi_slave_transmit(tx_data                => v_normalized_data(v_num_words - 1 downto 0),
                                  msg                    => format_msg(v_cmd),
                                  spi_if                 => spi_vvc_if,
+                                 terminate_access       => terminate_current_cmd.is_active,
                                  when_to_start_transfer => v_cmd.when_to_start_transfer,
                                  scope                  => C_SCOPE,
                                  msg_id_panel           => v_msg_id_panel,
                                  config                 => vvc_config.bfm_config);
             end if;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted slave transmit when in master mode
             alert(error, "Slave transmit called when VVC is in master mode.", C_SCOPE);
           end if;
@@ -604,13 +631,14 @@ begin
         when SLAVE_RECEIVE_ONLY =>
           if not GC_MASTER_MODE then
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
               spi_slave_receive(rx_data                => v_result(0)(GC_DATA_WIDTH - 1 downto 0),
                                 msg                    => format_msg(v_cmd),
                                 spi_if                 => spi_vvc_if,
+                                terminate_access       => terminate_current_cmd.is_active,
                                 when_to_start_transfer => v_cmd.when_to_start_transfer,
                                 scope                  => C_SCOPE,
                                 msg_id_panel           => v_msg_id_panel,
@@ -619,6 +647,7 @@ begin
               spi_slave_receive(rx_data                => v_data_receive(v_num_words - 1 downto 0),
                                 msg                    => format_msg(v_cmd),
                                 spi_if                 => spi_vvc_if,
+                                terminate_access       => terminate_current_cmd.is_active,
                                 when_to_start_transfer => v_cmd.when_to_start_transfer,
                                 scope                  => C_SCOPE,
                                 msg_id_panel           => v_msg_id_panel,
@@ -638,6 +667,8 @@ begin
               end if;
             end loop;
 
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, v_result, COMPLETED, C_SCOPE);
           else                          -- attempted slave receive when in master mode
             alert(error, "Slave receive called when VVC is in master mode.", C_SCOPE);
           end if;
@@ -645,13 +676,14 @@ begin
         when SLAVE_CHECK_ONLY =>
           if not GC_MASTER_MODE then    -- slave check
             -- Set vvc transaction info
-            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config);
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, IN_PROGRESS, C_SCOPE);
 
             -- Call the corresponding procedure in the BFM package.
             if v_num_words = 1 then
               spi_slave_check(data_exp               => v_cmd.data_exp(0)(GC_DATA_WIDTH - 1 downto 0),
                               msg                    => format_msg(v_cmd),
                               spi_if                 => spi_vvc_if,
+                              terminate_access       => terminate_current_cmd.is_active,
                               alert_level            => v_cmd.alert_level,
                               when_to_start_transfer => v_cmd.when_to_start_transfer,
                               scope                  => C_SCOPE,
@@ -664,12 +696,16 @@ begin
               spi_slave_check(data_exp               => v_normalized_data_exp(v_num_words - 1 downto 0),
                               msg                    => format_msg(v_cmd),
                               spi_if                 => spi_vvc_if,
+                              terminate_access       => terminate_current_cmd.is_active,
                               alert_level            => v_cmd.alert_level,
                               when_to_start_transfer => v_cmd.when_to_start_transfer,
                               scope                  => C_SCOPE,
                               msg_id_panel           => v_msg_id_panel,
                               config                 => vvc_config.bfm_config);
             end if;
+
+            -- Update vvc transaction info
+            set_global_vvc_transaction_info(vvc_transaction_info_trigger, vvc_transaction_info, v_cmd, vvc_config, COMPLETED, C_SCOPE);
           else                          -- attempted slave check when in master mode
             alert(error, "Slave check called when VVC is in master mode.", C_SCOPE);
           end if;

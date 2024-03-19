@@ -5,7 +5,7 @@ if { [info exists ::env(SIMULATOR)] } {
   puts "Simulator: $simulator"
 
   if [string equal $simulator "MODELSIM"] {
-    set compdirectives "-quiet -suppress 1346,1236,1090 -2008 -work $lib_name"
+    set compdirectives "-quiet -suppress 1346,1236 -2008 -work $lib_name"
   } elseif [string equal $simulator "RIVIERAPRO"] {
     set compdirectives "-2008 -nowarn COMP96_0564 -nowarn COMP96_0048 -dbg -work $lib_name"
   } else {
@@ -49,3 +49,6 @@ eval vcom  $compdirectives  $tb_path/axistream_vvc_simple_tb.vhd
 
 echo "eval vcom  $compdirectives  $tb_path/axistream_vvc_slv_array_tb.vhd"
 eval vcom  $compdirectives  $tb_path/axistream_vvc_slv_array_tb.vhd
+
+echo "eval vcom  $compdirectives  $tb_path/axistream_width_vvc_tb.vhd"
+eval vcom  $compdirectives  $tb_path/axistream_width_vvc_tb.vhd
