@@ -1,6 +1,28 @@
 Bitvis VIP UART - Overview on Versions and Changes
 ==============================================================
 
+v4.1.1
+----------
+Released: 2025-03-25
+- Updated the method for generating random values to control randomization seeds in uart_tx_vvc.
+- Updated the determine_error_injection() procedure to use the mechanism for controlling randomization seeds in vvc_methods_pkg.
+- Updated some .do files in order to allow compatibility between QuestaSim and Riviera Pro.
+
+v4.1.0
+----------
+Released: 2024-09-19
+- Removed old await_completion code from VVC.
+- Moved update_vvc_activity_register procedure to a common package for all VVCs.
+- Updated unwanted activity detection to ignore signal transitions from 'U', 'L' to/from '0', 'H' to/from '1'.
+
+v4.0.0
+----------
+Released: 2024-07-03
+- Changed max constants used in VVC to be adjustable from adaptations_pkg.
+- Added an individual constant to configure the VVC max instance number from adaptations_pkg.
+- Added completion detection test to UVVM demo tb.
+- Added unwanted activity detection functionality to the RX VVC to give an alert if the DUT generates any unexpected bus activity.
+- Added unwanted activity detection test to UVVM demo tb.
 
 v3.0.0
 ----------

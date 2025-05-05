@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -457,7 +457,7 @@ package body axilite_channel_handler_pkg is
     -- Checking RDATA
     for i in v_normalized_data'range loop
       -- Allow don't care in expected value and use match strictness from config for comparison
-      if v_normalized_data(i) = '-' or check_value(v_rdata_value(i), v_normalized_data(i), config.match_strictness, NO_ALERT, msg) then
+      if v_normalized_data(i) = '-' or check_value(v_rdata_value(i), v_normalized_data(i), config.match_strictness, NO_ALERT, msg, scope, ID_NEVER, msg_id_panel) then
         v_rdata_ok := true;
       else
         v_rdata_ok := false;
@@ -468,7 +468,7 @@ package body axilite_channel_handler_pkg is
     if not v_rdata_ok then
       -- Use binary representation when mismatch is due to weak signals
       if not v_rdata_ok then
-        v_alert_radix := BIN when config.match_strictness = MATCH_EXACT and check_value(v_rdata_value, v_normalized_data, MATCH_STD, NO_ALERT, msg) else HEX;
+        v_alert_radix := BIN when config.match_strictness = MATCH_EXACT and check_value(v_rdata_value, v_normalized_data, MATCH_STD, NO_ALERT, msg, scope, HEX_BIN_IF_INVALID, KEEP_LEADING_0, ID_NEVER, msg_id_panel) else HEX;
         alert(alert_level, proc_call & "=> Failed. Was " & to_string(v_rdata_value, v_alert_radix, AS_IS, INCL_RADIX) & ". Expected " & to_string(v_normalized_data, v_alert_radix, AS_IS, INCL_RADIX) & "." & LF & add_msg_delimiter(msg), scope);
       end if;
     else

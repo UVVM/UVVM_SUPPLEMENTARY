@@ -18,6 +18,10 @@ def main():
      # Get file lists
     filelist = get_file_list(".")
     golden_file_list = get_file_list("../script/maintenance_script/golden/")
+
+    for golden_list_item in golden_file_list:
+        if golden_list_item not in filelist:
+            print("Missing from file list: "+ golden_list_item)
     
     failing_verify_file = []
 
@@ -38,15 +42,17 @@ def main():
 
             # Compare files
             error_found = False
-            for idx, line in enumerate(golden_lines):
-                if golden_lines[idx] != verify_lines[idx]:
-                    failing_verify_file.append(filename)
-                    error_found = True
-                    break
-            # Check for line number mismatch
-            if not(error_found) and (golden_file_lines != check_file_lines):
+            if golden_file_lines == check_file_lines: # Compare content if line numbers match
+                for idx, line in enumerate(golden_lines):
+                    if golden_lines[idx] != verify_lines[idx]:
+                        failing_verify_file.append(filename)
+                        error_found = True
+                        break
+            else: # Line number mismatch
                 failing_verify_file.append(filename)
                 error_found = True
+
+
 
             # Remove OK files
             if not(error_found):

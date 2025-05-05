@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -196,9 +196,9 @@ package axi_bfm_pkg is
   ------------------------------------------
   -- init_axi_if_signals
   ------------------------------------------
-  -- - This function returns an AXI interface with initialized signals.
-  -- - All AXI input signals are initialized to 0
-  -- - All AXI output signals are initialized to Z
+  -- This function returns an AXI interface with initialized signals.
+  -- All BFM output signals are initialized to 0
+  -- All BFM input signals are initialized to Z
   function init_axi_if_signals(
     addr_width : natural;
     data_width : natural;

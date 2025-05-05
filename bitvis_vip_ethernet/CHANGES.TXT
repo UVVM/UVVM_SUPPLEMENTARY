@@ -1,6 +1,22 @@
 Bitvis VIP Ethernet - Overview on Versions and Changes
 ==============================================================
 
+v0.4.1
+----------
+Released: 2025-03-25
+- Updated some .do files in order to allow compatibility between QuestaSim and Riviera Pro.
+
+v0.4.0
+----------
+Released: 2024-09-19
+- Removed old await_completion code from VVC.
+- Moved update_vvc_activity_register procedure to a common package for all VVCs.
+
+v0.3.1
+----------
+Released: 2024-07-03
+- Changed max constants used in VVC to be adjustable from adaptations_pkg.
+- Added an individual constant to configure the VVC max instance number from adaptations_pkg.
 
 v0.3.0
 ----------

@@ -2,6 +2,30 @@ Bitvis VIP Avalon MM (Memory Mapped) - Overview of Versions and Changes
 ==============================================================
 ----------------------------------------------------------------------
 
+v4.1.0
+----------
+Released: 2024-09-19
+- Removed old await_completion code from VVC.
+- Moved update_vvc_activity_register procedure to a common package for all VVCs.
+- Update the VVC activity register in each executor individually using an ID to avoid problems with race conditions.
+- Check correctly whether a cmd_idx in this VVC has been executed in await_completion and fetch_result procedures.
+- Updated unwanted activity detection to ignore signal transitions from 'U', 'L' to/from '0', 'H' to/from '1'.
+
+v4.0.1
+----------
+Released: 2024-08-16
+- Converted documentation to RST format.
+
+v4.0.0
+----------
+Released: 2024-07-03
+- Changed max constants used in VVC to be adjustable from adaptations_pkg.
+- Added an individual constant to configure the VVC max instance number from adaptations_pkg.
+- Added PR from @aghoras fixing a problem with BFM sampling readdata one cycle too early when waitrequest is not asserted.
+- Fixed avalon_mm_read_response() sampling the same data in several pipelined commands.
+- Use dedicated scope in VVC pipeline processes.
+- Added unwanted activity detection functionality to the VVC to give an alert if the DUT generates any unexpected bus activity.
+
 v3.0.0
 ----------
 Released: 2024-03-08

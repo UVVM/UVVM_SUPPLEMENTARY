@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -36,7 +36,7 @@ use work.vvc_sb_pkg.all;
 package vvc_methods_pkg is
 
   --===============================================================================================
-  -- Types and constants for the SBI VVC 
+  -- Types and constants for the AVALON_MM VVC
   --===============================================================================================
   constant C_VVC_NAME : string := "AVALON_MM_VVC";
 
@@ -64,6 +64,7 @@ package vvc_methods_pkg is
     num_pipeline_stages                   : natural; -- Max read_requests in pipeline
     msg_id_panel                          : t_msg_id_panel; -- VVC dedicated message ID panel
     parent_msg_id_panel                   : t_msg_id_panel; --UVVM: temporary fix for HVVC, remove in v3.0
+    unwanted_activity_severity            : t_alert_level; -- Severity of alert to be initiated if unwanted activity on the DUT outputs is detected
   end record;
 
   type t_vvc_config_array is array (natural range <>) of t_vvc_config;
@@ -80,7 +81,8 @@ package vvc_methods_pkg is
     use_read_pipeline                     => TRUE,
     num_pipeline_stages                   => 5,
     msg_id_panel                          => C_VVC_MSG_ID_PANEL_DEFAULT,
-    parent_msg_id_panel                   => C_VVC_MSG_ID_PANEL_DEFAULT
+    parent_msg_id_panel                   => C_VVC_MSG_ID_PANEL_DEFAULT,
+    unwanted_activity_severity            => C_UNWANTED_ACTIVITY_SEVERITY
   );
 
   type t_vvc_status is record
@@ -116,9 +118,9 @@ package vvc_methods_pkg is
     msg         => (others => ' ')
   );
 
-  shared variable shared_avalon_mm_vvc_config       : t_vvc_config_array(0 to C_MAX_VVC_INSTANCE_NUM - 1)       := (others => C_AVALON_MM_VVC_CONFIG_DEFAULT);
-  shared variable shared_avalon_mm_vvc_status       : t_vvc_status_array(0 to C_MAX_VVC_INSTANCE_NUM - 1)       := (others => C_VVC_STATUS_DEFAULT);
-  shared variable shared_avalon_mm_transaction_info : t_transaction_info_array(0 to C_MAX_VVC_INSTANCE_NUM - 1) := (others => C_TRANSACTION_INFO_DEFAULT);
+  shared variable shared_avalon_mm_vvc_config       : t_vvc_config_array(0 to C_VVC_MAX_INSTANCE_NUM - 1)       := (others => C_AVALON_MM_VVC_CONFIG_DEFAULT);
+  shared variable shared_avalon_mm_vvc_status       : t_vvc_status_array(0 to C_VVC_MAX_INSTANCE_NUM - 1)       := (others => C_VVC_STATUS_DEFAULT);
+  shared variable shared_avalon_mm_transaction_info : t_transaction_info_array(0 to C_VVC_MAX_INSTANCE_NUM - 1) := (others => C_TRANSACTION_INFO_DEFAULT);
   shared variable AVALON_MM_VVC_SB                  : t_generic_sb;
 
   --==========================================================================================
@@ -230,17 +232,6 @@ package vvc_methods_pkg is
   procedure reset_vvc_transaction_info(
     variable vvc_transaction_info_group : inout t_transaction_group;
     constant vvc_cmd                    : in t_vvc_cmd_record);
-
-  --==============================================================================
-  -- VVC Activity
-  --==============================================================================
-  procedure update_vvc_activity_register(signal   global_trigger_vvc_activity_register : inout std_logic;
-                                         variable vvc_status                           : inout t_vvc_status;
-                                         constant activity                             : in t_activity;
-                                         constant entry_num_in_vvc_activity_register   : in integer;
-                                         constant last_cmd_idx_executed                : in natural;
-                                         constant command_queue_is_empty               : in boolean;
-                                         constant scope                                : in string := C_VVC_NAME);
 
 end package vvc_methods_pkg;
 
@@ -532,35 +523,4 @@ package body vvc_methods_pkg is
     wait for 0 ns;
   end procedure reset_vvc_transaction_info;
 
-  --==============================================================================
-  -- VVC Activity
-  --==============================================================================
-  procedure update_vvc_activity_register(signal   global_trigger_vvc_activity_register : inout std_logic;
-                                         variable vvc_status                           : inout t_vvc_status;
-                                         constant activity                             : in t_activity;
-                                         constant entry_num_in_vvc_activity_register   : in integer;
-                                         constant last_cmd_idx_executed                : in natural;
-                                         constant command_queue_is_empty               : in boolean;
-                                         constant scope                                : in string := C_VVC_NAME) is
-    variable v_activity : t_activity := activity;
-  begin
-    -- Update vvc_status after a command has finished (during same delta cycle the activity register is updated)
-    if activity = INACTIVE then
-      vvc_status.previous_cmd_idx := last_cmd_idx_executed;
-      vvc_status.current_cmd_idx  := 0;
-    end if;
-
-    if v_activity = INACTIVE and not (command_queue_is_empty) then
-      v_activity := ACTIVE;
-    end if;
-    shared_vvc_activity_register.priv_report_vvc_activity(vvc_idx               => entry_num_in_vvc_activity_register,
-                                                          activity              => v_activity,
-                                                          last_cmd_idx_executed => last_cmd_idx_executed);
-    if global_trigger_vvc_activity_register /= 'L' then
-      wait until global_trigger_vvc_activity_register = 'L';
-    end if;
-    gen_pulse(global_trigger_vvc_activity_register, 0 ns, "pulsing global trigger for vvc activity register", scope, ID_NEVER);
-  end procedure;
-
 end package body vvc_methods_pkg;
-

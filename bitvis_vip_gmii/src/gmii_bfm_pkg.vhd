@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -78,9 +78,9 @@ package gmii_bfm_pkg is
   --==========================================================================================
   -- BFM procedures 
   --==========================================================================================
-  -- This function returns a GMII interface with initialized signals.
-  -- All input signals are initialized to 0
-  -- All output signals are initialized to Z
+  -- This function returns an GMII interface with initialized signals.
+  -- All BFM output signals are initialized to 0
+  -- All BFM input signals are initialized to Z
   function init_gmii_if_signals
   return t_gmii_tx_if;
 

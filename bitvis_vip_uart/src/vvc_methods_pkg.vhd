@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -26,7 +26,6 @@ use uvvm_vvc_framework.ti_vvc_framework_support_pkg.all;
 
 use work.uart_bfm_pkg.all;
 use work.vvc_cmd_pkg.all;
-use work.monitor_cmd_pkg.all;
 use work.td_target_support_pkg.all;
 use work.transaction_pkg.all;
 use work.vvc_sb_pkg.all;
@@ -36,8 +35,7 @@ use work.vvc_sb_pkg.all;
 --=================================================================================================
 package vvc_methods_pkg is
 
-  constant C_VVC_NAME                    : string  := "UART_VVC";
-  constant C_EXECUTOR_RESULT_ARRAY_DEPTH : natural := 3;
+  constant C_VVC_NAME : string  := "UART_VVC";
 
   signal UART_VVCT : t_vvc_target_record := set_vvc_target_defaults(C_VVC_NAME);
   alias THIS_VVCT  : t_vvc_target_record is UART_VVCT;
@@ -86,6 +84,7 @@ package vvc_methods_pkg is
     error_injection                       : t_vvc_error_injection;
     bit_rate_checker                      : t_bit_rate_checker;
     parent_msg_id_panel                   : t_msg_id_panel; --UVVM: temporary fix for HVVC, remove in v3.0
+    unwanted_activity_severity            : t_alert_level; -- Severity of alert to be initiated if unwanted activity on the DUT TX output is detected
   end record;
 
   type t_vvc_config_array is array (t_channel range <>, natural range <>) of t_vvc_config;
@@ -102,7 +101,8 @@ package vvc_methods_pkg is
     msg_id_panel                          => C_VVC_MSG_ID_PANEL_DEFAULT,
     error_injection                       => C_VVC_ERROR_INJECTION_INACTIVE,
     bit_rate_checker                      => C_BIT_RATE_CHECKER_DEFAULT,
-    parent_msg_id_panel                   => C_VVC_MSG_ID_PANEL_DEFAULT
+    parent_msg_id_panel                   => C_VVC_MSG_ID_PANEL_DEFAULT,
+    unwanted_activity_severity            => C_UNWANTED_ACTIVITY_SEVERITY
   );
 
   type t_vvc_status is record
@@ -134,9 +134,9 @@ package vvc_methods_pkg is
     msg       => (others => ' ')
   );
 
-  shared variable shared_uart_vvc_config       : t_vvc_config_array(t_channel'left to t_channel'right, 0 to C_MAX_VVC_INSTANCE_NUM - 1)       := (others => (others => C_UART_VVC_CONFIG_DEFAULT));
-  shared variable shared_uart_vvc_status       : t_vvc_status_array(t_channel'left to t_channel'right, 0 to C_MAX_VVC_INSTANCE_NUM - 1)       := (others => (others => C_VVC_STATUS_DEFAULT));
-  shared variable shared_uart_transaction_info : t_transaction_info_array(t_channel'left to t_channel'right, 0 to C_MAX_VVC_INSTANCE_NUM - 1) := (others => (others => C_TRANSACTION_INFO_DEFAULT));
+  shared variable shared_uart_vvc_config       : t_vvc_config_array(t_channel'left to t_channel'right, 0 to C_VVC_MAX_INSTANCE_NUM - 1)       := (others => (others => C_UART_VVC_CONFIG_DEFAULT));
+  shared variable shared_uart_vvc_status       : t_vvc_status_array(t_channel'left to t_channel'right, 0 to C_VVC_MAX_INSTANCE_NUM - 1)       := (others => (others => C_VVC_STATUS_DEFAULT));
+  shared variable shared_uart_transaction_info : t_transaction_info_array(t_channel'left to t_channel'right, 0 to C_VVC_MAX_INSTANCE_NUM - 1) := (others => (others => C_TRANSACTION_INFO_DEFAULT));
   shared variable UART_VVC_SB                  : t_generic_sb;
 
   --==========================================================================================
@@ -225,17 +225,6 @@ package vvc_methods_pkg is
   procedure reset_vvc_transaction_info(
     variable vvc_transaction_info_group : inout t_transaction_group;
     constant vvc_cmd                    : in t_vvc_cmd_record);
-
-  --==============================================================================
-  -- VVC Activity
-  --==============================================================================
-  procedure update_vvc_activity_register(signal   global_trigger_vvc_activity_register : inout std_logic;
-                                         variable vvc_status                           : inout t_vvc_status;
-                                         constant activity                             : in t_activity;
-                                         constant entry_num_in_vvc_activity_register   : in integer;
-                                         constant last_cmd_idx_executed                : in natural;
-                                         constant command_queue_is_empty               : in boolean;
-                                         constant scope                                : in string := C_VVC_NAME);
 
   --==============================================================================
   -- Error Injection methods
@@ -458,36 +447,6 @@ package body vvc_methods_pkg is
   end procedure reset_vvc_transaction_info;
 
   --==============================================================================
-  -- VVC Activity
-  --==============================================================================
-  procedure update_vvc_activity_register(signal   global_trigger_vvc_activity_register : inout std_logic;
-                                         variable vvc_status                           : inout t_vvc_status;
-                                         constant activity                             : in t_activity;
-                                         constant entry_num_in_vvc_activity_register   : in integer;
-                                         constant last_cmd_idx_executed                : in natural;
-                                         constant command_queue_is_empty               : in boolean;
-                                         constant scope                                : in string := C_VVC_NAME) is
-    variable v_activity : t_activity := activity;
-  begin
-    -- Update vvc_status after a command has finished (during same delta cycle the activity register is updated)
-    if activity = INACTIVE then
-      vvc_status.previous_cmd_idx := last_cmd_idx_executed;
-      vvc_status.current_cmd_idx  := 0;
-    end if;
-
-    if v_activity = INACTIVE and not (command_queue_is_empty) then
-      v_activity := ACTIVE;
-    end if;
-    shared_vvc_activity_register.priv_report_vvc_activity(vvc_idx               => entry_num_in_vvc_activity_register,
-                                                          activity              => v_activity,
-                                                          last_cmd_idx_executed => last_cmd_idx_executed);
-    if global_trigger_vvc_activity_register /= 'L' then
-      wait until global_trigger_vvc_activity_register = 'L';
-    end if;
-    gen_pulse(global_trigger_vvc_activity_register, 0 ns, "pulsing global trigger for vvc activity register", scope, ID_NEVER);
-  end procedure;
-
-  --==============================================================================
   -- Error Injection methods
   --==============================================================================
 
@@ -497,6 +456,8 @@ package body vvc_methods_pkg is
     variable has_raised_warning_if_vvc_bfm_conflict : inout boolean;
     constant scope                                  : in string
   ) is
+    variable v_seeds : t_positive_vector(0 to 1);
+    variable v_rand  : real;
   begin
     if probability /= -1.0 then
       check_value_in_range(probability, 0.0, 1.0, tb_error, "Verify probability value within range 0.0 - 1.0.", scope, ID_NEVER);
@@ -507,9 +468,12 @@ package body vvc_methods_pkg is
         has_raised_warning_if_vvc_bfm_conflict := true;
       end if;
 
-      bfm_configured_error_injection_setting := (random(0.0, 1.0) <= probability);
+      -- Search the randomization seeds register with the scope and instance_name attribute as keys. The updated seeds are stored in v_seeds.
+      shared_rand_seeds_register.update_and_get_seeds(scope, v_seeds'instance_name, v_seeds);
+      -- Use the updated seeds to generate a random real number
+      random(0.0, 1.0, v_seeds(0), v_seeds(1), v_rand);
+      bfm_configured_error_injection_setting := (v_rand <= probability);
     end if;
   end procedure determine_error_injection;
 
 end package body vvc_methods_pkg;
-

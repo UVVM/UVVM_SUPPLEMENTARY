@@ -2,6 +2,28 @@ Bitvis VIP GPIO - Overview on Versions and Changes
 ==============================================================
 
 
+v3.1.1
+----------
+Released: 2025-03-25
+- Removed support for don't care operator in expected value in gpio_check_stable() BFM procedure.
+- Updated BFM QuickRef regarding the don't care operator usage.
+- Converted documentation to RST format.
+
+v3.1.0
+----------
+Released: 2024-09-19
+- Removed old await_completion code from VVC.
+- Moved update_vvc_activity_register procedure to a common package for all VVCs.
+- Updated unwanted activity detection to ignore signal transitions from 'U', 'L' to/from '0', 'H' to/from '1'.
+
+v3.0.0
+----------
+Released: 2024-07-03
+- Add support for set/check single std_logic (instead of std_logic_vector).
+- Changed max constants used in VVC to be adjustable from adaptations_pkg.
+- Added an individual constant to configure the VVC max instance number from adaptations_pkg.
+- Added unwanted activity detection functionality to the VVC to give an alert if the DUT generates any unexpected bus activity.
+
 v2.0.0
 ----------
 Released: 2024-03-08
