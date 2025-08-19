@@ -47,3 +47,6 @@ eval vcom  $compdirectives  $tb_path/rand_tb.vhd
 
 echo "eval vcom  $compdirectives  $tb_path/func_cov_tb.vhd"
 eval vcom  $compdirectives  $tb_path/func_cov_tb.vhd
+
+echo "eval vcom  $compdirectives  $tb_path/uvvm_assertions_tb.vhd"
+eval vcom  $compdirectives  $tb_path/uvvm_assertions_tb.vhd

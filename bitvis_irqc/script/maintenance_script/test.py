@@ -13,7 +13,6 @@ except:
 
 def cleanup(msg='Cleaning up...'):
     print(msg)
-    return
 
     sim_path = os.getcwd()
 

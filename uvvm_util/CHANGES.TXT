@@ -1,7 +1,63 @@
 UVVM Utility Library - Overview on Versions and Changes
 ==============================================================
 
-----------------------------------------------------------------------
+v2.21.1
+----------
+Released: 2025-08-18
+- Fixed TB_WARNING when calling clear_rand_cyclic() in enhanced randomization.
+- Minor modifications to Siemens test-version of upcoming rand and functional coverage extensions for Questa.
+- Added UVVM assertions and demo testbench.
+
+v2.21.0
+----------
+Released: 2025-05-11
+- Changed C_SPI_VVC_DATA_ARRAY_WIDTH from 31 to 32 in adaptations_pkg.
+- Added preliminary test version of upcoming rand and functional coverage extensions for Questa. 
+
+v2.20.0
+----------
+Released: 2025-03-25
+- Fixed set_rand_seeds(string) procedure being dependent on previous seed values.
+- Modified alert text for mode_error in check_file_open_status.
+- Added t_seeds type for controlling randomization seeds in protected_types_pkg.
+- Added shared_rand_seeds_register, a shared variable for controlling randomization seeds in global_signals_and_shared_variables_pkg.
+- Added C_RAND_MAX_INSTANCE_NAME_LENGTH, a constant for controlling randomization seeds in adaptations_pkg.
+- Added set_rand_seeds(string) procedure in methods_pkg to control randomization seeds from VVCs.
+- Updated some .do files in order to allow compatibility between QuestaSim and Riviera Pro.
+- Print an alert and reduce the resolution in the random(time) functions whenever the resolution parameter is bigger than the range.
+- Use the lowest time unit among the range parameters instead of the simulator resolution limit for the random(time) functions.
+- Added time_resolution parameter to rand(), rand_range_weight() and rand_range_weight_mode() time functions for single-method approach.
+- Added time_resolution parameter to add_range_time() and added new procedure set_range_weight_time_resolution() for multi-method approach.
+- Fixed logging and distribution of range values in randm() when using time values.
+- Fixed issue with multiple subsequent calls to the clocked gen_pulse procedure.
+- Removed unused type t_pulse_continuation.
+- Added radix and prefix parameters to the integer, signed, and unsigned versions of check_value_in_range and await_change_to_value.
+- Removed the deallocate call from tee. The user should take care of memory management.
+- Added get_basename(string) to the string_methods package to get the file name from a path string.
+- Added scalable time units in check_stable().
+
+v2.19.7
+----------
+Released: 2024-09-19
+- Changed default names for log and alert files to UVVM_Log.txt and UVVM_Alert.txt
+
+v2.19.6
+----------
+Released: 2024-07-03
+- Fixed bug in .single_tc_vs_single_req listed output files in spec cov.
+
+v2.19.5
+----------
+Released: 2024-07-03
+- Sort the coverage files in the func_cov_merge.py script to always get the same order of bins in the report.
+- Fixed a GHDL bound check failure in unsigned rand() when having wrong min and max constraints.
+- Fixed a GHDL exponentiation overflow error in rand_pkg.
+- Changed max constants used in BFMs and VVCs to be adjustable from adaptations_pkg.
+- Added individual constants to configure the VVCs max instance number from adaptations_pkg.
+- Reorganized adaptations_pkg for better overview and moved internal UVVM constants and types to other packages.
+- Added await_change_to_value() to uvvm_util with same parameters as await_value() with a req of change
+- Added completion detection functionality to wait for all the enabled scoreboards to be empty: await_sb_completion(), check_sb_completion().
+- Added new msg_id in adaptations_pkg: ID_AWAIT_UVVM_COMPLETION.
 
 v2.19.4
 ----------
@@ -12,6 +68,7 @@ Released: 2024-03-08
 - Added subtypes used as null vectors to reduce the number of compilation warnings in rand_pkg.
 - Added for latest version of Modelsim.
 - Fixed a bug in func_cov_pkg when using Modelsim 2023.4 which caused transition bins to be sampled incorrectly.
+- Added function to check_value to properly display signed values
 
 v2.19.3
 ----------

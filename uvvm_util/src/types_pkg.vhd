@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -14,12 +14,9 @@
 -- Description   : See library quick reference (under 'doc') and README-file(s)
 ------------------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
-
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 use std.textio.all;
 
 package types_pkg is
@@ -31,6 +28,7 @@ package types_pkg is
 
   type t_void is (VOID);
 
+  type t_boolean_array is array (natural range <>) of boolean;
   type t_natural_array is array (natural range <>) of natural;
   type t_integer_array is array (natural range <>) of integer;
   type t_slv_array is array (natural range <>) of std_logic_vector;
@@ -92,8 +90,6 @@ package types_pkg is
   -- FIRST_BYTE_LEFT and FIRST_BYTE_RIGHT are deprecated and will be removed in next major release
   type t_byte_endianness is (LOWER_BYTE_LEFT, LOWER_BYTE_RIGHT, LOWER_WORD_LEFT, LOWER_WORD_RIGHT, FIRST_BYTE_LEFT, FIRST_BYTE_RIGHT);
   alias t_word_endianness is t_byte_endianness;
-
-  type t_pulse_continuation is (ALLOW_PULSE_CONTINUATION, NO_PULSE_CONTINUATION_ALLOWED);
 
   type t_coverage_representation is (NO_GOAL, GOAL_CAPPED, GOAL_UNCAPPED);
 
@@ -235,8 +231,20 @@ package types_pkg is
 
   type t_error_report_extent is (EXTENDED, BRIEF);
 
+  type t_report_alert_counters is (NO_REPORT, REPORT_ALERT_COUNTERS, REPORT_ALERT_COUNTERS_FINAL);
+
+  type t_report_vvc is (NO_REPORT, REPORT_VVCS);
+
+  type t_report_sb is (NO_REPORT, REPORT_SCOREBOARDS);
+
+  constant C_CMD_IDX_PREFIX : string := " [";
+  constant C_CMD_IDX_SUFFIX : string := "]";
+
+  constant ALL_INSTANCES         : integer := -2;
+  constant ALL_ENABLED_INSTANCES : integer := -3;
+
   -------------------------------------
-  -- SB
+  -- Scoreboard
   -------------------------------------
   -- Identifier_option: Typically describes what the next parameter means.
   -- - ENTRY_NUM :
@@ -249,6 +257,20 @@ package types_pkg is
   type t_range_option is (SINGLE, AND_LOWER, AND_HIGHER);
 
   type t_tag_usage is (TAG, NO_TAG);
+
+  -- These values are used to indicate outdated sub-programs
+  constant C_DEPRECATE_SETTING               : t_deprecate_setting := DEPRECATE_ONCE;
+  shared variable deprecated_subprogram_list : t_deprecate_list    := (others => (others => ' '));
+
+  type t_relational_operator is (LT, GT, EQ, LE, GE, NE);
+  type t_arithmetic_operator is (ADD, SUB, MULT, DIV);
+
+  -----------------------------------------
+  -- UVVM ASSERTIONS
+  -----------------------------------------
+  type t_pos_ack_kind is (EVERY, FIRST);
+  type t_shift_one_ness_cond is (ANY_BIT_ALERT, LAST_BIT_ALERT, ANY_BIT_ALERT_NO_PIPE, LAST_BIT_ALERT_NO_PIPE);
+  type t_accept_all_zeros is (ALL_ZERO_ALLOWED, ALL_ZERO_NOT_ALLOWED);
 
 end package types_pkg;
 

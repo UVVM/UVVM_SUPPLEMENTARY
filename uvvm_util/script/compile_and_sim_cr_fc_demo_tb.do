@@ -1,5 +1,5 @@
 #================================================================================================================================
-# Copyright 2020 Bitvis
+# Copyright 2024 UVVM
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 #
@@ -13,12 +13,12 @@
 #-----------------------------------------------------------------------
 # Compile libraries and source files
 #-----------------------------------------------------------------------
-do compile_src.do ../../uvvm_util ../../uvvm_util/sim
-do compile_src.do ../../uvvm_vvc_framework ../../uvvm_vvc_framework/sim
-do compile_src.do ../../bitvis_vip_scoreboard ../../bitvis_vip_scoreboard/sim
-do compile_src.do ../../bitvis_vip_sbi ../../bitvis_vip_sbi/sim
-do compile_src.do ../../bitvis_vip_uart ../../bitvis_vip_uart/sim
-do compile_src.do ../../bitvis_uart ../../bitvis_uart/sim
+do ../script/compile_src.do ../../uvvm_util ../../uvvm_util/sim
+do ../script/compile_src.do ../../uvvm_vvc_framework ../../uvvm_vvc_framework/sim
+do ../script/compile_src.do ../../bitvis_vip_scoreboard ../../bitvis_vip_scoreboard/sim
+do ../script/compile_src.do ../../bitvis_vip_sbi ../../bitvis_vip_sbi/sim
+do ../script/compile_src.do ../../bitvis_vip_uart ../../bitvis_vip_uart/sim
+do ../script/compile_src.do ../../bitvis_uart ../../bitvis_uart/sim
 
 #-----------------------------------------------------------------------
 # Compile testbench files

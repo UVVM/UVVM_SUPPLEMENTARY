@@ -162,7 +162,7 @@ architecture behav of i2c_vvc_tb is
     constant max_wait_time : in time := 5 ms
   ) is
     variable v_cmd_idx              : natural;
-    variable v_wishbone_read_result : std_logic_vector(bitvis_vip_wishbone.vvc_cmd_pkg.C_VVC_CMD_DATA_MAX_LENGTH - 1 downto 0);
+    variable v_wishbone_read_result : std_logic_vector(bitvis_vip_wishbone.transaction_pkg.C_VVC_CMD_DATA_MAX_LENGTH - 1 downto 0);
 
     variable v_timeout    : boolean := false;
     variable v_start_time : time    := now;

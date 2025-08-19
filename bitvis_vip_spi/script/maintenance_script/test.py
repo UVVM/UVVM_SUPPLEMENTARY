@@ -70,7 +70,7 @@ sim_options = None
 simulator_name = hr.settings.get_simulator_name()
 # Set simulator name and compile options
 if simulator_name in ["MODELSIM", "RIVIERA"]:
-    sim_options = "-t ns"
+    sim_options = "-t ps"
     com_options = ["-suppress", "1346,1246,1236", "-2008"]
     hr.set_simulator(simulator=simulator_name, com_options=com_options)
 elif simulator_name == "GHDL":

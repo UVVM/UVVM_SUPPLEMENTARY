@@ -819,6 +819,7 @@ begin
       ----------------------------------------------------------------------------------------------------------------------------
       log(ID_LOG_HDR, "Slave start on next SS", C_SCOPE);
       ----------------------------------------------------------------------------------------------------------------------------
+      increment_expected_alerts(TB_WARNING, 1); -- Because of time stamp truncate warning
       for idx in 1 to 5 loop
         tx_word := random(GC_DATA_WIDTH); --std_logic_vector(to_unsigned(idx, GC_DATA_WIDTH)); --random(GC_DATA_WIDTH);
         -- transfer missed word
@@ -1052,6 +1053,7 @@ begin
       ----------------------------------------------------------------------------------------------------------------------------
       log(ID_LOG_HDR, "Single-word transfer", C_SCOPE);
       ----------------------------------------------------------------------------------------------------------------------------
+      increment_expected_alerts(TB_WARNING, 1); -- Because of time stamp truncate warning
       for iteration in 0 to 10 loop
         tx_word := random(GC_DATA_WIDTH);
         -- Master TX must be active for any transactions to occur; drives sclk and ss_n
@@ -1396,6 +1398,7 @@ begin
       -- Set single-word inter_bfm_delay
       set_single_word_inter_bfm_delay;
 
+      increment_expected_alerts(TB_WARNING, 1); -- Because of time stamp truncate warning
       tx_word := random(GC_DATA_WIDTH);
       SPI_VVC_SB.add_expected(C_VVC_IDX_SLAVE_1, pad_spi_sb(tx_word));
       spi_slave_receive_only(SPI_VVCT, C_VVC_IDX_SLAVE_1, TO_SB, "SPI Slave receive data and send to SB");
@@ -1414,6 +1417,7 @@ begin
       ----------------------------------------------------------------------------------------------------------------------------
       log(ID_LOG_HDR_LARGE, "Testing Unwanted Activity Detection in VVC", C_SCOPE);
       ----------------------------------------------------------------------------------------------------------------------------
+      increment_expected_alerts(TB_WARNING, 1); -- Because of time stamp truncate warning
       for i in 0 to 2 loop
         -- Test different alert severity configurations
         if i = 0 then

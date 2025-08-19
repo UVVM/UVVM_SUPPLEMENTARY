@@ -1,5 +1,5 @@
 --================================================================================================================================
--- Copyright 2020 Bitvis
+-- Copyright 2024 UVVM
 -- Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 -- You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 and in the provided LICENSE.TXT.
 --
@@ -29,6 +29,10 @@ package bfm_common_pkg is
   -- General declarations related to BFMs
   type t_normalization_mode is (ALLOW_WIDER, ALLOW_NARROWER, ALLOW_WIDER_NARROWER, ALLOW_EXACT_ONLY);
   alias t_normalisation_mode is t_normalization_mode;
+
+  -- Constants for random configurations
+  constant C_RANDOM          : integer := -1;
+  constant C_MULTIPLE_RANDOM : integer := -2;
 
   -- Functions/procedures
   impure function normalise(

@@ -33,6 +33,7 @@ print("Verify Bitvis VIP Ethernet")
 cleanup("Removing any previous runs.")
 
 hr = HDLRegression()
+simulator_name = hr.settings.get_simulator_name()
 
 # Add util, fw and VIP Scoreboard
 hr.add_files("../../../uvvm_util/src/*.vhd", "uvvm_util")
@@ -57,6 +58,10 @@ hr.add_files("../../../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_v
 # Add testbench and harness
 hr.add_files("../../tb/*.vhd", "bitvis_vip_ethernet")
 hr.add_files("../../tb/maintenance_tb/*.vhd", "bitvis_vip_ethernet")
+# The testbench below fails with NVC 1.16.0 due to wrong data coming out ethernet_with_fifos.tx_fifo.ethernet_mac_tx_fifo_xilinx (external IP)
+# Both Modelsim and GHDL work fine so this is most likely an NVC issue
+if simulator_name == "NVC":
+    hr.remove_file("../../tb/maintenance_tb/ethernet_gmii_mac_master_tb.vhd", "bitvis_vip_ethernet")
 
 # Add TB dependencies
 hr.add_files("../../tb/maintenance_tb/ethernet_mac-master/xilinx/XilinxCoreLib/*.vhd", "xilinxcorelib")
@@ -69,7 +74,6 @@ hr.add_files("../../tb/maintenance_tb/ethernet_mac-master/xilinx/ipcore_dir/*.vh
 
 sim_options = None
 com_options = None
-simulator_name = hr.settings.get_simulator_name()
 # Set simulator name and compile options
 if simulator_name in ["MODELSIM", "RIVIERA"]:
     sim_options = "-t ps"

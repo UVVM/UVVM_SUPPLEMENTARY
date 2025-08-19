@@ -1,6 +1,42 @@
 UVVM VVC Framework - Overview on Versions and Changes
+==============================================================
 
-----------------------------------------------------------------------
+v2.12.12
+----------
+Released: 2025-08-18
+- Added a check for duplicated VVC ID in the activity register in ti_protected_types_pkg.
+- Updated check_unwanted_activity() procedures to ignore signal transitions from 'X' to '0'/'1'.
+
+v2.12.11
+----------
+Released: 2025-03-25
+- Updated vvc_generator.py to add missing delta cycle needed to update the last_cmd_idx_executed when not using transaction info.
+
+v2.12.10
+----------
+Released: 2024-10-08
+- Updated vvc_generator.py with fixes for runtime errors in the VVCs.
+
+v2.12.9
+----------
+Released: 2024-09-19
+- Updated vvc_generator.py with fixes for VVCs with multiple executors.
+- Added a common procedure, check_unwanted_activity(), so that VVCs can call it to check for unwanted activity.
+- Added a mechanism in the check_unwanted_activity() procedure to ignore signal transitions from 'U', 'L' to/from '0', 'H' to/from '1'.
+- Updated vvc_generator.py to use the check_unwanted_activity() procedure.
+
+v2.12.8
+----------
+Released: 2024-08-16
+- Converted VVC generator documentation to RST format.
+
+v2.12.7
+----------
+Released: 2024-07-03
+- Added ti_vvc_framework_context.vhd to compile_order.txt
+- Added completion detection functionality to wait for all the VVCs to be inactive with no pending commands to be executed, and
+  for all the enabled scoreboards to be empty: await_uvvm_completion().
+- Updated vvc_generator.py to add unwanted activity detection.
 
 v2.12.6
 ----------
@@ -14,6 +50,7 @@ Released: 2024-03-08
 - Updated vvc_generator.py to move sb_pkg and pad_xxx_sb function from methods_pkg to new vvc_sb_pkg.
 - Updated vvc_generator.py generation of vvc_context file.
 - Minor fixes in vvc_generator.py including scoreboard being configured in all sub-channel VVCs.
+- Updated vvc_generator.py to use an individual constant to configure the VVC max instance number.
 
 v2.12.5
 ----------
