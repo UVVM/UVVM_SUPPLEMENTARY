@@ -18,6 +18,24 @@ def find_python3_executable():
     return None
 
 
+# Execute alternative simulation scripts
+def run_do_scripts(script_args=[]):
+    simulator_name = "MODELSIM" # Default simulator in HDLRegression
+    script_args = sys.argv[1:]
+    for idx, arg in enumerate(script_args):
+        if arg == "-s":
+            simulator_name = script_args[idx+1].upper()
+
+    if simulator_name == "MODELSIM" or simulator_name == "RIVIERA" or simulator_name == "RIVIERA-PRO":
+        print('\nVerify .do scripts...')
+        return_code = subprocess.run(["vsim", "-c", "-do", "do ../script/compile_all.do ../script; exit"], stdout = subprocess.DEVNULL).returncode
+        if return_code == 0:
+            print("\n\n===>> compile_all.do script completed successfully")
+        else:
+            print("\n\n===>> WARNING!! compile_all.do script exited with error code {}. SUMMARY: FAIL".format(return_code), file=sys.stderr)
+
+
+# Execute every test.py scripts from each VIP
 def find_and_run_tests(base_dir="..", script_args=[], python_exec="Python3"):
 
     pattern = os.path.join(base_dir, "*/script/maintenance_script/test.py")
@@ -48,8 +66,6 @@ def find_and_run_tests(base_dir="..", script_args=[], python_exec="Python3"):
         if not os.path.exists(sim_dir):
             print("Creating missing sim directory: {}".format(sim_dir))
             os.makedirs(sim_dir)
-
-        print("\n\n{}\n{}\n =====>>>>>  UVVM regression script running  <<<<<===== \n{}".format(("=" * 80), (" " * 8), ("=" * 80)))
 
         try:
             return_code = subprocess.run([python_exec, os.path.relpath(test_script, start=sim_dir)] + script_args, cwd=sim_dir).returncode
@@ -101,4 +117,6 @@ if __name__ == "__main__":
     python_exe = find_python3_executable()
 
     script_args = sys.argv[1:]
+    print("\n\n{}\n{}\n =====>>>>>  UVVM regression script running  <<<<<===== \n{}".format(("=" * 80), (" " * 8), ("=" * 80)))
+    run_do_scripts(script_args)
     find_and_run_tests(base_dir, script_args, python_exe)

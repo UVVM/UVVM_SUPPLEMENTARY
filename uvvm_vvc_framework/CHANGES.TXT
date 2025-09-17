@@ -1,6 +1,11 @@
 UVVM VVC Framework - Overview on Versions and Changes
 ==============================================================
 
+v2.12.13
+----------
+Released: 2025-09-17
+- Fixed vvc_generator.py where v_msg_id_panel was not being used correctly in cmd_interpreter.
+
 v2.12.12
 ----------
 Released: 2025-08-18

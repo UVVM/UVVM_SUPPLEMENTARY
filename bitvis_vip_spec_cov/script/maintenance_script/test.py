@@ -12,6 +12,7 @@ except:
     sys.exit(1)
 
 
+# Find the correct python executable
 def find_python3_executable():
     python_executables = ["python3", "python"]
 
@@ -25,11 +26,10 @@ def find_python3_executable():
     return None
 
 
+# Clean the sim directory
 def cleanup(msg="Cleaning up..."):
     print(msg)
-
     sim_path = os.getcwd()
-
     # Check if the current directory is 'sim'
     if os.path.basename(sim_path) == "sim":
         for files in os.listdir(sim_path):
@@ -42,11 +42,10 @@ def cleanup(msg="Cleaning up..."):
         print('Current directory is not "sim". Skipping cleanup.')
 
 
+# Function for testing that running run_spec_cov.py with the --clean parameter
+# works as intended, both for deleting files in the current directory, and
+# when specifying a directory to be cleaned.
 def test_clean_parameter():
-    # Function for testing that running run_spec_cov.py with the --clean parameter
-    # works as intended, both for deleting files in the current directory, and
-    # when specifying a directory to be cleaned.
-
     print("Testing '--clean (DIR)' parameter of run_spec_cov.py")
 
     # Create subdirectory within test directory to test cleaning of specified directory.
@@ -97,10 +96,10 @@ hr.add_files("../../../uvvm_util/src/*.vhd", "uvvm_util")
 hr.add_files("../../../uvvm_vvc_framework/src/*.vhd", "uvvm_vvc_framework")
 hr.add_files("../../../bitvis_vip_scoreboard/src/*.vhd", "bitvis_vip_scoreboard")
 hr.add_files("../../src/*.vhd", "bitvis_vip_spec_cov")
-
 # Add TB/TH
 hr.add_files("../../tb/maintenance_tb/*.vhd", "bitvis_vip_spec_cov")
 
+# Setup TB test generics
 hr.add_generics(
     entity="spec_cov_tb",
     generics=[
@@ -113,13 +112,11 @@ hr.add_generics(
     ],
 )
 
+# Set simulator name and options
 sim_options = None
 simulator_name = hr.settings.get_simulator_name()
-# Set simulator name and compile options
-if simulator_name in ["MODELSIM", "RIVIERA"]:
+if simulator_name == "MODELSIM":
     sim_options = "-t ns"
-    com_options = ["-suppress", "1346,1246,1236", "-2008"]
-    hr.set_simulator(simulator=simulator_name, com_options=com_options)
 
 hr.start(sim_options=sim_options)
 
@@ -163,13 +160,11 @@ hr.add_files("../../../uvvm_vvc_framework/src_target_dependent/*.vhd", "bitvis_v
 # Add Spec Cov VIP
 hr.add_files("../../src/*.vhd", "bitvis_vip_spec_cov")
 
+# Set simulator name and options
 sim_options = None
 simulator_name = hr.settings.get_simulator_name()
-# Set simulator name and compile options
-if simulator_name in ["MODELSIM", "RIVIERA"]:
+if simulator_name == "MODELSIM":
     sim_options = "-t ns"
-    com_options = ["-suppress", "1346,1246,1236", "-2008"]
-    hr.set_simulator(simulator=simulator_name, com_options=com_options)
 
 script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
 script_path = script_path.replace("\\", "/")
@@ -200,5 +195,17 @@ if num_passing_tests == 0:
 # Remove output only if OK
 if num_failing_tests == 0:
     cleanup("Removing simulation output")
+
+# Run alternative simulation scripts
+if simulator_name == "MODELSIM" or simulator_name == "RIVIERA-PRO":
+    print('\nVerify .do scripts...')
+    (ret_txt, ret_code) = hr.run_command(["vsim", "-c", "-do", "do ../script/compile_demo.do; exit"], False)
+    if ret_code == 0:
+        print("SIMULATION SUCCESS")
+        cleanup('Removing simulation output\n')
+    else:
+        print(ret_txt)
+        num_failing_tests += 1
+
 # Return number of failing tests
 sys.exit(num_failing_tests)
